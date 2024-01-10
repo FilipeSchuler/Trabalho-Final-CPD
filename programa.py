@@ -32,3 +32,6 @@ csv_entrada = 'players_15.csv'
 txt_saida = 'status.txt'
 
 processar_csv(csv_entrada, txt_saida)
+
+print('ola')
+
