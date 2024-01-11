@@ -1,5 +1,5 @@
 import csv
-
+import pickle
 
 # Função para ler o arquivo CSV e salvar apenas as colunas desejadas em um arquivo TXT
 def processar_csv(csv_entrada, txt_saida):
@@ -23,39 +23,39 @@ def processar_csv(csv_entrada, txt_saida):
             informacoes_desejadas.append(','.join(info_selecionadas))
 
     # Abre o arquivo TXT para escrever
-    with open(txt_saida, 'w', encoding='utf-8') as txt_arquivo:
-        # Escreve as informações desejadas no arquivo TXT
-        for info in informacoes_desejadas:
-            txt_arquivo.write(info + '\n')
+    with open(txt_saida, 'wb') as txt_arquivo:
+         # Usa o módulo pickle para serializar e gravar os dados no arquivo binário
+        pickle.dump(informacoes_desejadas, txt_arquivo)
 
 
 def filtro_nacionalidade(dados, teste):
     nacao = input()
-    nomes_desejados = []
+    info_jogadores_desejados = []
 
     with open(dados, 'r', newline='', encoding='utf-8') as arq_dados:
             # Cria um objeto leitor CSV
             leitura_dados = csv.DictReader(arq_dados)
             for col in leitura_dados: 
-                rela = [col['nationality'], col['short_name']]
-                if nacao in rela[0]:
-                    nomes_desejados.append(''.join(rela[1]))
+                rela = [col['short_name'], col['overall'], col['age']]
+                if nacao in col['nationality']:
+                    info_jogadores_desejados.append(''.join(rela))
 
 
-    with open(teste, 'w', encoding='utf-8') as txt_arquivo:
-        for nome in nomes_desejados:
-                txt_arquivo.write(nome + '\n')
+    with open(teste, 'wb') as txt_arquivo:
+        
+        pickle.dump(info_jogadores_desejados, txt_arquivo)
+        
 
 
 
 # Exemplo de uso
-csv_entrada = 'players_15.csv'
-txt_saida = 'dados.csv'
+csv_entrada = 'fifa_cards.csv'
+txt_saida = 'teste.bin'
 
 processar_csv(csv_entrada, txt_saida)
 
 dados = 'dados.csv'
-teste = 'teste.txt'
+teste = 'teste.bin'
 
 filtro_nacionalidade(dados, teste)
 
