@@ -105,6 +105,16 @@ class ArvoreTrie:
             no = no.filhos[char]
         no.fim_da_palavra = True
 
+    def obter_dados_arvore_trie(self, no=None, palavra_atual='', dados=None):
+        if dados is None:
+            dados = []
+        if no is None:
+            no = self.raiz
+        if no.fim_da_palavra:
+            dados.append([palavra_atual])
+        for chave, filho in no.filhos.items():
+            self.obter_dados_arvore(filho, palavra_atual + chave, dados)
+        return dados
 
     def imprimir(self, no=None, palavra=''):
         if no is None:
@@ -155,14 +165,19 @@ def criar_arvore_b(arvore, coluna, busca):
         pickle.dump(arvore, dados_bin)
 
 
-def criar_arvore_trie(arvore, coluna, arquivo):
-    with open(arquivo, newline='', encoding='utf-8') as arq_csv:
+def criar_arvore_trie(arvore, coluna, arq_entrada, arq_saida):
+    with open(arq_entrada, newline='', encoding='utf-8') as arq_csv:
         ler_csv = csv.reader(arq_csv)
         for col in ler_csv:
-            arvore.inserir(col[coluna])  # Supondo que a nacionalidade está na primeira coluna
+            arvore.inserir(col[coluna]) 
     
-    with open('arvore_trie.bin', 'wb') as nac_bin:
-        pickle.dump(arvore,nac_bin)
+    dados_arvore = arvore.obter_dados_arvore_trie()
+    
+    with open(arq_saida, 'w', newline='', encoding='utf-8') as arq_csv:
+        writer = csv.writer(arq_csv)
+        writer.writerows(dados_arvore)
+    # with open('arvore_trie.bin', 'wb') as nac_bin:
+    #     pickle.dump(arvore,nac_bin)
 
 def campo_de_busca(entrada_teclado):
     with open(csv_entrada, 'r', newline='', encoding='utf-8') as arq_csv:
@@ -175,26 +190,32 @@ def campo_de_busca(entrada_teclado):
     
 #Definição de alguns arquivos
 csv_entrada = 'fifa_cards.csv'
-dados_csv = 'dados.csv'
-dez_cartas = 'dez_cartas.csv'
+arquivo_dos_dados = 'arquivo_dos_dados.csv'
+poucos_dados = 'poucos_dados.csv'
+
+lista_nacionalidades = 'lista_nac.csv'
+lista_clubes = 'lista_clubes.csv'
+lista_nomes = 'lista_nomes.csv'
+lista_overall = 'lista_overall.csv'
+lista_idade = 'lista_idade.csv'
 
 #Seleciona quais dados serão usados
-processar_csv(csv_entrada, dados_csv)
+processar_csv(csv_entrada, arquivo_dos_dados)
 
 #Criando a árvore B
 arvoreB_overall = ArvoreB(3)
-criar_arvore_b(arvoreB_overall, 'overall','dez_cartas.csv')
+criar_arvore_b(arvore=arvoreB_overall, coluna='overall', busca=poucos_dados)
 
 arvoreB_idade = ArvoreB(3)
-criar_arvore_b(arvoreB_idade, 'age', 'dez_cartas.csv')
+criar_arvore_b(arvore=arvoreB_idade, coluna='age', busca=poucos_dados)
 
 #Criando árvore Trie
 arvoreTrie_nome_jogador = ArvoreTrie()
-criar_arvore_trie(arvoreTrie_nome_jogador, 1, 'dez_cartas.csv')
+criar_arvore_trie(arvore=arvoreTrie_nome_jogador, coluna=1, arq_entrada=poucos_dados, arq_saida=lista_nomes)
 
 arvoreTrie_nacionalidade = ArvoreTrie()
-criar_arvore_trie(arvoreTrie_nacionalidade, 4, 'dez_cartas.csv')
+criar_arvore_trie(arvore=arvoreTrie_nacionalidade,coluna=4,arq_entrada=poucos_dados,arq_saida=lista_nacionalidades)
 
 arvoreTrie_clube = ArvoreTrie()
-criar_arvore_trie(arvoreTrie_clube, 5, 'dez_cartas.csv')
+criar_arvore_trie(arvore=arvoreTrie_clube, coluna=5, arq_entrada=poucos_dados, arq_saida=lista_clubes)
 
