@@ -54,7 +54,41 @@ class ArvoreB:
             z.filhos = y.filhos[t:]
             y.filhos = y.filhos[:t]
     
-    
+    def criar_arvore_b(self, coluna, fonte, arq_saida):
+        chaves = []
+
+        with open(busca, 'r', newline='', encoding='utf-8') as dados_csv:
+                # Cria um objeto leitor CSV - uso da biblioteca csv
+                ler_dez_cartas = csv.DictReader(dados_csv)
+
+                for col in ler_dez_cartas:
+                    info_selecionadas = [col[coluna], col['short_name']]
+                    chaves.append(','.join(info_selecionadas))
+
+        for chave in chaves:
+            self.inserir(chave)
+
+        # print("\nArvore B: ")
+        # arvore.mostrar()
+
+        dados_arvore = self.obter_dados_arvore_b()
+
+        with open(arq_saida, 'w', newline='', encoding='utf-8') as arq_csv:
+            writer = csv.writer(arq_csv)
+            writer.writerows(dados_arvore)
+
+
+    def obter_dados_arvore_b(self, no=None, dados=None):
+        if dados is None:
+            dados = []
+        if no is None:
+            no = self.raiz
+        dados.append(no.chaves)
+        if not no.eh_folha:
+            for filho in no.filhos:
+                self.obter_dados_arvore_b(filho, dados)
+        return dados
+
     def percorrer_e_imprimir_crescente(self):
         self.percorrer_em_ordem_crescente(self.raiz)
 
@@ -104,6 +138,26 @@ class ArvoreTrie:
                 no.filhos[char] = NoArvoreTrie()
             no = no.filhos[char]
         no.fim_da_palavra = True
+    
+    def criar_arvore_trie(self, coluna, arq_entrada, arq_saida):
+        with open(arq_entrada, newline='', encoding='utf-8') as arq_csv:
+            ler_csv = csv.reader(arq_csv)
+            for col in ler_csv:
+                self.inserir(col[coluna]) 
+        
+        dados_arvore = self.obter_dados_arvore_trie()
+        
+        with open(arq_saida, 'w', newline='', encoding='utf-8') as arq_csv:
+            writer = csv.writer(arq_csv)
+            writer.writerows(dados_arvore)
+    
+    def buscar(self, palavra):
+        no = self.raiz
+        for char in palavra:
+            if char not in no.filhos:
+                return False
+            no = no.filhos[char]
+        return no.fim_da_palavra
 
     def obter_dados_arvore_trie(self, no=None, palavra_atual='', dados=None):
         if dados is None:
@@ -113,7 +167,7 @@ class ArvoreTrie:
         if no.fim_da_palavra:
             dados.append([palavra_atual])
         for chave, filho in no.filhos.items():
-            self.obter_dados_arvore(filho, palavra_atual + chave, dados)
+            self.obter_dados_arvore_trie(filho, palavra_atual + chave, dados)
         return dados
 
     def imprimir(self, no=None, palavra=''):
@@ -144,53 +198,25 @@ def processar_csv(csv_entrada, csv_saida):
         for info in informacoes_desejadas:
             arq_csv.write(info + '\n')
 
-def criar_arvore_b(arvore, coluna, busca):
-    chaves = []
+def prepara_aux_dados(arq_dados, busca, arq_aux):
+    informacoes_desejadas = []
+    with open(arq_dados, 'r', newline='', encoding='utf-8') as arq_dados:
+        leitura_dados = csv.DictReader(arq_dados)
+        for col in leitura_dados:
+            if col[busca] == entrada_teclado:
+                informacoes_desejadas.append(','.join(col[1]))
+    with open(arq_aux, 'w', encoding='utf-8') as arq_aux:
+        for info in informacoes_desejadas:
+            arq_aux.write(info + '\n')
 
-    with open(busca, 'r', newline='', encoding='utf-8') as dados_csv:
-            # Cria um objeto leitor CSV - uso da biblioteca csv
-            ler_dez_cartas = csv.DictReader(dados_csv)
-
-            for col in ler_dez_cartas:
-                info_selecionadas = [col[coluna], col['short_name']]
-                chaves.append(','.join(info_selecionadas))
-
-    for chave in chaves:
-        arvore.inserir(chave)
-
-    # print("\nArvore B: ")
-    # arvore.mostrar()
-
-    with open('dados.bin', 'wb') as dados_bin:
-        pickle.dump(arvore, dados_bin)
-
-
-def criar_arvore_trie(arvore, coluna, arq_entrada, arq_saida):
-    with open(arq_entrada, newline='', encoding='utf-8') as arq_csv:
-        ler_csv = csv.reader(arq_csv)
-        for col in ler_csv:
-            arvore.inserir(col[coluna]) 
-    
-    dados_arvore = arvore.obter_dados_arvore_trie()
-    
-    with open(arq_saida, 'w', newline='', encoding='utf-8') as arq_csv:
-        writer = csv.writer(arq_csv)
-        writer.writerows(dados_arvore)
-    # with open('arvore_trie.bin', 'wb') as nac_bin:
-    #     pickle.dump(arvore,nac_bin)
-
-def campo_de_busca(entrada_teclado):
-    with open(csv_entrada, 'r', newline='', encoding='utf-8') as arq_csv:
-        # Cria um objeto leitor CSV - uso da biblioteca csv
-        leitura_csv = csv.DictReader(arq_csv)
-
-
+        
 
 ###################################### Inicio da aplicação ########################################
     
 #Definição de alguns arquivos
 csv_entrada = 'fifa_cards.csv'
 arquivo_dos_dados = 'arquivo_dos_dados.csv'
+arq_aux_dados = 'arquivo_aux.csv'
 poucos_dados = 'poucos_dados.csv'
 
 lista_nacionalidades = 'lista_nac.csv'
@@ -202,20 +228,90 @@ lista_idade = 'lista_idade.csv'
 #Seleciona quais dados serão usados
 processar_csv(csv_entrada, arquivo_dos_dados)
 
-#Criando a árvore B
-arvoreB_overall = ArvoreB(3)
-criar_arvore_b(arvore=arvoreB_overall, coluna='overall', busca=poucos_dados)
-
-arvoreB_idade = ArvoreB(3)
-criar_arvore_b(arvore=arvoreB_idade, coluna='age', busca=poucos_dados)
-
-#Criando árvore Trie
+#Inicializa/cria as árvores Trie
 arvoreTrie_nome_jogador = ArvoreTrie()
-criar_arvore_trie(arvore=arvoreTrie_nome_jogador, coluna=1, arq_entrada=poucos_dados, arq_saida=lista_nomes)
+arvoreTrie_nome_jogador.criar_arvore_trie(coluna=1, arq_entrada=poucos_dados, arq_saida=lista_nomes)
 
 arvoreTrie_nacionalidade = ArvoreTrie()
-criar_arvore_trie(arvore=arvoreTrie_nacionalidade,coluna=4,arq_entrada=poucos_dados,arq_saida=lista_nacionalidades)
+arvoreTrie_nacionalidade.criar_arvore_trie(coluna=4,arq_entrada=poucos_dados,arq_saida=lista_nacionalidades)
 
 arvoreTrie_clube = ArvoreTrie()
-criar_arvore_trie(arvore=arvoreTrie_clube, coluna=5, arq_entrada=poucos_dados, arq_saida=lista_clubes)
+arvoreTrie_clube.criar_arvore_trie(coluna=5, arq_entrada=poucos_dados, arq_saida=lista_clubes)
 
+arvoreB_overall = ArvoreB(3)
+arvoreB_idade = ArvoreB(3)
+arvore_b = ArvoreB(3)
+
+
+
+
+
+print('Se deseja buscar uma nacionalidade digite-a no campo de busca, ou tecle 1 para deixar o campo vazio\n')
+entrada_teclado = input('Campo de Pesquisa: ')
+##Faz a busca do que foi digitado nas arvores trie, caso encontrado -> Cria uma arvore b filtrando dos dados
+##gerais somente oq foi digitado no campo de pesquisa
+#print(arvoreTrie_nacionalidade.buscar(entrada_teclado))
+
+print('\nSelecione uma opção\n1.Ordenar por overall crescente\n2.Ordenar por overall decrescente\n'
+        '3.Ordenar por idade crescente\n4.Ordenar por idade decrescente\n')
+
+selecao_valida = False
+while(selecao_valida == False):
+    selecao_filtro = input()
+    if selecao_filtro == '1':
+        filtro = 'overall'
+        arvore_b = arvoreB_overall
+        lista = lista_overall
+        ordem = 'crescente'
+    
+        selecao_valida = True
+    elif selecao_filtro == '2':
+        filtro = 'overall'
+        arvore_b = arvoreB_overall
+        lista = lista_overall
+        ordem = 'decrescente'
+
+        selecao_valida = True
+    elif selecao_filtro == '3':
+        filtro = 'idade'
+        arvore_b = arvoreB_idade
+        lista = lista_idade
+        ordem = 'crescente'
+
+        selecao_valida = True
+    elif selecao_filtro == '4':
+        filtro = 'idade'
+        arvore_b = arvoreB_idade
+        lista = lista_idade
+        ordem = 'decrescente'
+
+        selecao_valida = True
+    else:
+        print('Opção inválida!')
+
+
+
+if arvoreTrie_nacionalidade.buscar(entrada_teclado) == True:
+    #Cria arvore com base de dados na nacionalidade escolhida
+    busca = 4
+    prepara_aux_dados(arq_dados=poucos_dados, busca=busca, arq_aux=arq_aux_dados)
+    arvore_b.criar_arvore_b(coluna=str(filtro), fonte=arq_aux_dados, arq_saida=lista)
+
+elif arvoreTrie_nome_jogador.buscar(entrada_teclado) == True:
+    #Cria arvore com base de dados do prefixo de nome escolhido
+    arvore_b.criar_arvore_b(coluna=str(filtro), fonte=poucos_dados, arq_saida=lista)
+
+elif arvoreTrie_clube.buscar(entrada_teclado) == True:
+    #Cria arvore com base de dados do prefixo do clube escolhido
+    arvore_b.criar_arvore_b(coluna=str(filtro), fonte=poucos_dados, arq_saida=lista)
+
+
+
+
+
+
+# #Criando a árvore B com base na busca
+# criar_arvore_b(arvore=arvoreB_overall, coluna='overall', busca=poucos_dados, arq_saida=lista_overall)
+
+# 
+# criar_arvore_b(arvore=arvoreB_idade, coluna='age', busca=poucos_dados, arq_saida=lista_idade)
