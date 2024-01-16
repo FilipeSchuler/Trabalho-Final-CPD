@@ -161,7 +161,7 @@ def criar_arvore_trie(arvore, coluna, arquivo):
         for col in ler_csv:
             arvore.inserir(col[coluna])  # Supondo que a nacionalidade está na primeira coluna
     
-    with open('nacionalidades.bin', 'wb') as nac_bin:
+    with open('arvore_trie.bin', 'wb') as nac_bin:
         pickle.dump(arvore,nac_bin)
 
 def campo_de_busca(entrada_teclado):
@@ -174,27 +174,27 @@ def campo_de_busca(entrada_teclado):
 ###################################### Inicio da aplicação ########################################
     
 #Definição de alguns arquivos
-csv_entrada = 'TF-CPD/fifa_cards.csv'
-dados_csv = 'TF-CPD/dados.csv'
-dez_cartas = 'TF-CPD/dez_cartas.csv'
+csv_entrada = 'fifa_cards.csv'
+dados_csv = 'dados.csv'
+dez_cartas = 'dez_cartas.csv'
 
 #Seleciona quais dados serão usados
 processar_csv(csv_entrada, dados_csv)
 
 #Criando a árvore B
 arvoreB_overall = ArvoreB(3)
-criar_arvore_b(arvoreB_overall, 'overall','TF-CPD/dez_cartas.csv')
+criar_arvore_b(arvoreB_overall, 'overall','dez_cartas.csv')
 
 arvoreB_idade = ArvoreB(3)
-criar_arvore_b(arvoreB_idade, 'age', 'TF-CPD/dez_cartas.csv')
+criar_arvore_b(arvoreB_idade, 'age', 'dez_cartas.csv')
 
 #Criando árvore Trie
 arvoreTrie_nome_jogador = ArvoreTrie()
-criar_arvore_trie(arvoreTrie_nome_jogador, 1, 'TF-CPD/dez_cartas.csv')
+criar_arvore_trie(arvoreTrie_nome_jogador, 1, 'dez_cartas.csv')
 
 arvoreTrie_nacionalidade = ArvoreTrie()
-criar_arvore_trie(arvoreTrie_nacionalidade, 4, 'TF-CPD/dez_cartas.csv')
+criar_arvore_trie(arvoreTrie_nacionalidade, 4, 'dez_cartas.csv')
 
 arvoreTrie_clube = ArvoreTrie()
-criar_arvore_trie(arvoreTrie_clube, 5, 'TF-CPD/dez_cartas.csv')
+criar_arvore_trie(arvoreTrie_clube, 5, 'dez_cartas.csv')
 
