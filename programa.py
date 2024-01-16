@@ -1,61 +1,200 @@
 import csv
 import pickle
+import random
+import struct
+import os
+import ast
 
-# Função para ler o arquivo CSV e salvar apenas as colunas desejadas em um arquivo TXT
-def processar_csv(csv_entrada, txt_saida):
-    # Lista para armazenar as informações desejadas
+#Pra overall e idade
+class NoArvoreB:
+    def __init__(self, eh_folha=True):
+        self.eh_folha = eh_folha
+        self.chaves = []
+        self.filhos = []
+
+class ArvoreB:
+    def __init__(self, t):
+        self.raiz = NoArvoreB(eh_folha=True)
+        self.t = t
+    
+    def inserir(self, chave):
+        raiz = self.raiz
+        if len(raiz.chaves) == (2 * self.t - 1):
+            novo_no = NoArvoreB(eh_folha=False)
+            novo_no.filhos.append(raiz)
+            self.dividir_filho(novo_no, 0)
+            self.raiz = novo_no
+        self.inserir_nao_cheio(self.raiz, chave)
+
+    def inserir_nao_cheio(self, x, chave):
+        i = len(x.chaves) - 1
+        if x.eh_folha:
+            while i >= 0 and chave < x.chaves[i]:
+                i -= 1
+            x.chaves.insert(i + 1, chave)
+        else:
+            while i >= 0 and chave < x.chaves[i]:
+                i -= 1
+            i += 1
+            if len(x.filhos[i].chaves) == (2 * self.t - 1):
+                self.dividir_filho(x, i)
+                if chave > x.chaves[i]:
+                    i += 1
+            self.inserir_nao_cheio(x.filhos[i], chave)
+
+    def dividir_filho(self, x, i):
+        t = self.t
+        y = x.filhos[i]
+        z = NoArvoreB(eh_folha=y.eh_folha)
+        x.filhos.insert(i + 1, z)
+        x.chaves.insert(i, y.chaves[t - 1])
+        z.chaves = y.chaves[t:]
+        y.chaves = y.chaves[:t - 1]
+        if not y.eh_folha:
+            z.filhos = y.filhos[t:]
+            y.filhos = y.filhos[:t]
+    
+    
+    def percorrer_e_imprimir_crescente(self):
+        self.percorrer_em_ordem_crescente(self.raiz)
+
+    def percorrer_em_ordem_crescente(self, no):
+        if no is not None:
+            i = 0
+            while i < len(no.chaves):
+                # Se não é folha, visite o filho antes de visitar a chave
+                if not no.eh_folha:
+                    self.percorrer_em_ordem_crescente(no.filhos[i])
+                print(no.chaves[i])
+                i += 1
+            # Se não é folha, visite o último filho
+            if not no.eh_folha:
+                self.percorrer_em_ordem_crescente(no.filhos[i])
+    
+    def percorrer_e_imprimir_decrescente(self):
+        self.percorrer_em_ordem_decrescente(self.raiz)
+
+    def percorrer_em_ordem_decrescente(self, no):
+        if no is not None:
+            i = len(no.chaves) - 1
+            while i >= 0:
+                # Se não é folha, visite o filho depois de visitar a chave
+                if not no.eh_folha:
+                    self.percorrer_em_ordem_decrescente(no.filhos[i + 1])
+                print(no.chaves[i])
+                i -= 1
+            # Se não é folha, visite o primeiro filho
+            if not no.eh_folha:
+                self.percorrer_em_ordem_decrescente(no.filhos[0])
+
+#Pra nome, nacionalidade e clube
+class NoArvoreTrie:
+    def __init__(self):
+        self.filhos = {}
+        self.fim_da_palavra = False
+
+class ArvoreTrie:
+    def __init__(self):
+        self.raiz = NoArvoreTrie()
+
+    def inserir(self, palavra):
+        no = self.raiz
+        for char in palavra:
+            if char not in no.filhos:
+                no.filhos[char] = NoArvoreTrie()
+            no = no.filhos[char]
+        no.fim_da_palavra = True
+
+
+    def imprimir(self, no=None, palavra=''):
+        if no is None:
+            no = self.raiz
+        if no.fim_da_palavra:
+            print(palavra)
+        for char, prox_no in no.filhos.items():
+            self.imprimir(prox_no, palavra + char)
+
+
+def processar_csv(csv_entrada, csv_saida):
     informacoes_desejadas = []
 
-    # Abre o arquivo CSV para leitura
-    with open(csv_entrada, 'r', newline='', encoding='utf-8') as csv_arquivo:
-        # Cria um objeto leitor CSV
-        csv_leitura = csv.DictReader(csv_arquivo)
+    with open(csv_entrada, 'r', newline='', encoding='utf-8') as arq_csv:
+        leitura_csv = csv.DictReader(arq_csv)
 
-        # Adiciona o cabeçalho ao arquivo TXT
-        atributos = ['short_name', 'overall', 'age', 'nationality', 'club', 'player_positions']
+        # Adiciona o cabeçalho ao arquivo 
+        atributos = ['sofifa_id','short_name', 'overall', 'age', 'nationality', 'club', 'player_positions']
         informacoes_desejadas.append(','.join(atributos))
-
-        # Itera sobre as linhas do arquivo CSV
-        for col in csv_leitura:
-            # Seleciona as colunas desejadas
-            info_selecionadas = [col['short_name'], col['overall'], col['age'], col['nationality'],
+        #Adiciona dados ao arquivo
+        for col in leitura_csv:
+            info_selecionadas = [col['sofifa_id'], col['short_name'], col['overall'], col['age'], col['nationality'],
                                   col['club'], col['player_positions']]
             informacoes_desejadas.append(','.join(info_selecionadas))
 
-    # Abre o arquivo TXT para escrever
-    with open(txt_saida, 'wb') as txt_arquivo:
-         # Usa o módulo pickle para serializar e gravar os dados no arquivo binário
-        pickle.dump(informacoes_desejadas, txt_arquivo)
+    with open(csv_saida, 'w', encoding='utf-8') as arq_csv:
+        for info in informacoes_desejadas:
+            arq_csv.write(info + '\n')
+
+def criar_arvore_b(arvore, coluna, busca):
+    chaves = []
+
+    with open(busca, 'r', newline='', encoding='utf-8') as dados_csv:
+            # Cria um objeto leitor CSV - uso da biblioteca csv
+            ler_dez_cartas = csv.DictReader(dados_csv)
+
+            for col in ler_dez_cartas:
+                info_selecionadas = [col[coluna], col['short_name']]
+                chaves.append(','.join(info_selecionadas))
+
+    for chave in chaves:
+        arvore.inserir(chave)
+
+    # print("\nArvore B: ")
+    # arvore.mostrar()
+
+    with open('dados.bin', 'wb') as dados_bin:
+        pickle.dump(arvore, dados_bin)
 
 
-def filtro_nacionalidade(dados, teste):
-    nacao = input()
-    info_jogadores_desejados = []
+def criar_arvore_trie(arvore, coluna, arquivo):
+    with open(arquivo, newline='', encoding='utf-8') as arq_csv:
+        ler_csv = csv.reader(arq_csv)
+        for col in ler_csv:
+            arvore.inserir(col[coluna])  # Supondo que a nacionalidade está na primeira coluna
+    
+    with open('nacionalidades.bin', 'wb') as nac_bin:
+        pickle.dump(arvore,nac_bin)
 
-    with open(dados, 'r', newline='', encoding='utf-8') as arq_dados:
-            # Cria um objeto leitor CSV
-            leitura_dados = csv.DictReader(arq_dados)
-            for col in leitura_dados: 
-                rela = [col['short_name'], col['overall'], col['age']]
-                if nacao in col['nationality']:
-                    info_jogadores_desejados.append(''.join(rela))
-
-
-    with open(teste, 'wb') as txt_arquivo:
-        
-        pickle.dump(info_jogadores_desejados, txt_arquivo)
-        
+def campo_de_busca(entrada_teclado):
+    with open(csv_entrada, 'r', newline='', encoding='utf-8') as arq_csv:
+        # Cria um objeto leitor CSV - uso da biblioteca csv
+        leitura_csv = csv.DictReader(arq_csv)
 
 
 
-# Exemplo de uso
-csv_entrada = 'fifa_cards.csv'
-txt_saida = 'teste.bin'
+###################################### Inicio da aplicação ########################################
+    
+#Definição de alguns arquivos
+csv_entrada = 'TF-CPD/fifa_cards.csv'
+dados_csv = 'TF-CPD/dados.csv'
+dez_cartas = 'TF-CPD/dez_cartas.csv'
 
-processar_csv(csv_entrada, txt_saida)
+#Seleciona quais dados serão usados
+processar_csv(csv_entrada, dados_csv)
 
-dados = 'dados.csv'
-teste = 'teste.bin'
+#Criando a árvore B
+arvoreB_overall = ArvoreB(3)
+criar_arvore_b(arvoreB_overall, 'overall','TF-CPD/dez_cartas.csv')
 
-filtro_nacionalidade(dados, teste)
+arvoreB_idade = ArvoreB(3)
+criar_arvore_b(arvoreB_idade, 'age', 'TF-CPD/dez_cartas.csv')
+
+#Criando árvore Trie
+arvoreTrie_nome_jogador = ArvoreTrie()
+criar_arvore_trie(arvoreTrie_nome_jogador, 1, 'TF-CPD/dez_cartas.csv')
+
+arvoreTrie_nacionalidade = ArvoreTrie()
+criar_arvore_trie(arvoreTrie_nacionalidade, 4, 'TF-CPD/dez_cartas.csv')
+
+arvoreTrie_clube = ArvoreTrie()
+criar_arvore_trie(arvoreTrie_clube, 5, 'TF-CPD/dez_cartas.csv')
 
