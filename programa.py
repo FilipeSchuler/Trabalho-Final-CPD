@@ -1,183 +1,5 @@
-import csv
-import pickle
-import random
-import struct
-import os
-import ast
-
-#Pra overall e idade
-class NoArvoreB:
-    def __init__(self, eh_folha=True):
-        self.eh_folha = eh_folha
-        self.chaves = []
-        self.filhos = []
-
-class ArvoreB:
-    def __init__(self, t):
-        self.raiz = NoArvoreB(eh_folha=True)
-        self.t = t
-    
-    #Função de inserir nó na arvore e suas auxiliares
-    def inserir(self, chave):
-        raiz = self.raiz
-        if len(raiz.chaves) == (2 * self.t - 1):
-            novo_no = NoArvoreB(eh_folha=False)
-            novo_no.filhos.append(raiz)
-            self.dividir_filho(novo_no, 0)
-            self.raiz = novo_no
-        self.inserir_nao_cheio(self.raiz, chave)
-
-    #Função auxiliar na inserção de um nó na árvore
-    def inserir_nao_cheio(self, x, chave):
-        i = len(x.chaves) - 1
-        if x.eh_folha:
-            while i >= 0 and chave < x.chaves[i]:
-                i -= 1
-            x.chaves.insert(i + 1, chave)
-        else:
-            while i >= 0 and chave < x.chaves[i]:
-                i -= 1
-            i += 1
-            if len(x.filhos[i].chaves) == (2 * self.t - 1):
-                self.dividir_filho(x, i)
-                if chave > x.chaves[i]:
-                    i += 1
-            self.inserir_nao_cheio(x.filhos[i], chave)
-    
-    #Função auxiliar na inserção de um nó na árvore
-    def dividir_filho(self, x, i):
-        t = self.t
-        y = x.filhos[i]
-        z = NoArvoreB(eh_folha=y.eh_folha)
-        x.filhos.insert(i + 1, z)
-        x.chaves.insert(i, y.chaves[t - 1])
-        z.chaves = y.chaves[t:]
-        y.chaves = y.chaves[:t - 1]
-        if not y.eh_folha:
-            z.filhos = y.filhos[t:]
-            y.filhos = y.filhos[:t]
-    
-
-    def criar_arvore_b(self, coluna, arq_entrada, arq_saida):
-        chaves = []
-
-        with open(arq_entrada, 'r', newline='', encoding='utf-8') as arq_csv:
-                # Cria um objeto leitor CSV - uso da biblioteca csv
-                ler_dez_cartas = csv.DictReader(arq_csv)
-
-                for col in ler_dez_cartas:
-                    info_selecionadas = [col[coluna], col['short_name']]
-                    chaves.append(','.join(info_selecionadas))
-
-        for chave in chaves:
-            self.inserir(chave)
-
-        dados_arvore = self.obter_dados_arvore_b()
-        with open(arq_saida, 'w', newline='', encoding='utf-8') as arq_csv:
-            writer = csv.writer(arq_csv)
-            writer.writerows(dados_arvore)
-
-
-    def obter_dados_arvore_b(self, no=None, dados=None):
-        if dados is None:
-            dados = []
-        if no is None:
-            no = self.raiz
-        dados.append(no.chaves)
-        if not no.eh_folha:
-            for filho in no.filhos:
-                self.obter_dados_arvore_b(filho, dados)
-        return dados
-
-    def percorrer_e_imprimir_crescente(self):
-        self.percorrer_em_ordem_crescente(self.raiz)
-
-    def percorrer_em_ordem_crescente(self, no):
-        if no is not None:
-            i = 0
-            while i < len(no.chaves):
-                # Se não é folha, visita o filho antes de visitar a chave
-                if not no.eh_folha:
-                    self.percorrer_em_ordem_crescente(no.filhos[i])
-                print(no.chaves[i])
-                i += 1
-            # Se não é folha, visita o último filho
-            if not no.eh_folha:
-                self.percorrer_em_ordem_crescente(no.filhos[i])
-    
-    def percorrer_e_imprimir_decrescente(self):
-        self.percorrer_em_ordem_decrescente(self.raiz)
-
-    def percorrer_em_ordem_decrescente(self, no):
-        if no is not None:
-            i = len(no.chaves) - 1
-            while i >= 0:
-                # Se não é folha, visita o filho depois de visitar a chave
-                if not no.eh_folha:
-                    self.percorrer_em_ordem_decrescente(no.filhos[i + 1])
-                print(no.chaves[i])
-                i -= 1
-            # Se não é folha, visita o primeiro filho
-            if not no.eh_folha:
-                self.percorrer_em_ordem_decrescente(no.filhos[0])
-
-#Pra nome, nacionalidade e clube
-class NoArvoreTrie:
-    def __init__(self):
-        self.filhos = {}
-        self.fim_da_palavra = False
-
-class ArvoreTrie:
-    def __init__(self):
-        self.raiz = NoArvoreTrie()
-
-    def inserir(self, palavra):
-        no = self.raiz
-        for char in palavra:
-            if char not in no.filhos:
-                no.filhos[char] = NoArvoreTrie()
-            no = no.filhos[char]
-        no.fim_da_palavra = True
-    
-    def criar_arvore_trie(self, coluna, arq_entrada, arq_saida):
-        with open(arq_entrada, newline='', encoding='utf-8') as arq_csv:
-            ler_csv = csv.reader(arq_csv)
-            for col in ler_csv:
-                self.inserir(col[coluna]) 
-        
-        dados_arvore = self.obter_dados_arvore_trie()
-        
-        with open(arq_saida, 'w', newline='', encoding='utf-8') as arq_csv:
-            writer = csv.writer(arq_csv)
-            writer.writerows(dados_arvore)
-    
-    def buscar(self, palavra):
-        no = self.raiz
-        for char in palavra:
-            if char not in no.filhos:
-                return False
-            no = no.filhos[char]
-        return no.fim_da_palavra
-
-    def obter_dados_arvore_trie(self, no=None, palavra_atual='', dados=None):
-        if dados is None:
-            dados = []
-        if no is None:
-            no = self.raiz
-        if no.fim_da_palavra:
-            dados.append([palavra_atual])
-        for chave, filho in no.filhos.items():
-            self.obter_dados_arvore_trie(filho, palavra_atual + chave, dados)
-        return dados
-
-    def imprimir(self, no=None, palavra=''):
-        if no is None:
-            no = self.raiz
-        if no.fim_da_palavra:
-            print(palavra)
-        for char, prox_no in no.filhos.items():
-            self.imprimir(prox_no, palavra + char)
-
+from arvores import *
+from clubes import *
 
 def processar_csv(csv_entrada, csv_saida):
     informacoes_desejadas = []
@@ -198,8 +20,7 @@ def processar_csv(csv_entrada, csv_saida):
         for info in informacoes_desejadas:
             arq_csv.write(info + '\n')
 
-
-def prepara_aux_dados(arq_entrada, coluna, entrada_teclado, arq_saida):
+def prep_arq_aux(arq_entrada, coluna, strings, arq_saida):
     with open(arq_entrada, 'r', newline='', encoding='utf-8') as arq_csv:
         leitor_csv = csv.reader(arq_csv)
         colunas = next(leitor_csv)
@@ -211,27 +32,124 @@ def prepara_aux_dados(arq_entrada, coluna, entrada_teclado, arq_saida):
             escritor_csv.writerow(colunas)
 
             for linha in leitor_csv:
-                if linha[indice].lower() == entrada_teclado.lower():
-                    escritor_csv.writerow(linha)
+                for string in strings:
+                    if linha[indice] == string:
+                        escritor_csv.writerow(linha)
 
+
+
+def tela_adicionar_jogador():
+    print('\nTela escolha jogador\n')
+
+def tela_excluir_time():
+    print('\nTela excluir jogadorer\n')
+
+def tela_estatisticas():
+    print('\nTela estatísticas\n')
+
+
+def buscar_jogador():
+    print('\nSe deseja buscar uma nacionalidade digite-a no campo de busca, ou tecle enter para deixar o campo vazio')
+    entrada_teclado = input('Campo de Pesquisa: ')
+    ##Faz a busca do que foi digitado nas arvores trie, caso encontrado -> Cria uma arvore b filtrando dos dados
+    ##gerais somente oq foi digitado no campo de pesquisa
+
+    print('\nSelecione uma opção\n1.Ordenar por overall crescente\n2.Ordenar por overall decrescente\n'
+            '3.Ordenar por idade crescente\n4.Ordenar por idade decrescente\n')
+
+    selecao_valida = False
+    while(selecao_valida == False):
+        selecao_filtro = input()
+        if selecao_filtro == '1':
+            filtro = 'overall'
+            arvore_b = arvoreB_overall
+            lista = lista_overall
+            ordem = 'crescente'
+        
+            selecao_valida = True
+        elif selecao_filtro == '2':
+            filtro = 'overall'
+            arvore_b = arvoreB_overall
+            lista = lista_overall
+            ordem = 'decrescente'
+
+            selecao_valida = True
+        elif selecao_filtro == '3':
+            filtro = 'age'
+            arvore_b = arvoreB_idade
+            lista = lista_idade
+            ordem = 'crescente'
+
+            selecao_valida = True
+        elif selecao_filtro == '4':
+            filtro = 'age'
+            arvore_b = arvoreB_idade
+            lista = lista_idade
+            ordem = 'decrescente'
+
+            selecao_valida = True
+        else:
+            print('Opção inválida!')
+        
+    aplicar_filtros(entrada_teclado, filtro, ordem, lista, arvore_b)
+
+
+def aplicar_filtros(entrada_teclado, filtro, ordem, lista, arvore_b):
+    #### **** MELHORIA -> Pensar maneira pra nao repetir nomes - Pesquisa = in -> Schweinsteiger aparece 3x (?)
+    if entrada_teclado == '':
+        arvore_b.criar_arvore_b(coluna=str(filtro), arq_entrada=poucos_dados, arq_saida=lista)
+        if ordem == 'crescente':
+            arvore_b.percorrer_e_imprimir_crescente()
+        if ordem == 'decrescente':
+            arvore_b.percorrer_e_imprimir_decrescente()
+
+    else:
+        palavras_encontradas = arvoreTrie_nome_jogador.buscar_substring(entrada_teclado)
+        if palavras_encontradas != []:
+            print(f"Palavras que contêm a substring '{entrada_teclado}': {palavras_encontradas}")
+            prep_arq_aux(arq_entrada=poucos_dados, coluna='short_name', strings=palavras_encontradas,arq_saida=arq_aux_dados)
+            arvore_b.criar_arvore_b(coluna=str(filtro), arq_entrada=arq_aux_dados, arq_saida=lista)
+            if ordem == 'crescente':
+                arvore_b.percorrer_e_imprimir_crescente()
+            if ordem == 'decrescente':
+                arvore_b.percorrer_e_imprimir_decrescente()
+
+        palavras_encontradas = arvoreTrie_nacionalidade.buscar_substring(entrada_teclado)
+        if palavras_encontradas != []:
+            prep_arq_aux(arq_entrada=poucos_dados, coluna='nationality', strings=palavras_encontradas,arq_saida=arq_aux_dados)
+            arvore_b.criar_arvore_b(coluna=str(filtro), arq_entrada=arq_aux_dados, arq_saida=lista)
+            if ordem == 'crescente':
+                arvore_b.percorrer_e_imprimir_crescente()
+            if ordem == 'decrescente':
+                arvore_b.percorrer_e_imprimir_decrescente()
+
+        palavras_encontradas = arvoreTrie_clube.buscar_substring(entrada_teclado)
+        if palavras_encontradas != []:
+            prep_arq_aux(arq_entrada=poucos_dados, coluna='club', strings=palavras_encontradas,arq_saida=arq_aux_dados)
+            arvore_b.criar_arvore_b(coluna=str(filtro), arq_entrada=arq_aux_dados, arq_saida=lista)
+            if ordem == 'crescente':
+                arvore_b.percorrer_e_imprimir_crescente()
+            if ordem == 'decrescente':
+                arvore_b.percorrer_e_imprimir_decrescente()
 
 
 ###################################### Inicio da aplicação ########################################
     
 #Definição de alguns arquivos
-csv_entrada = 'fifa_cards.csv'
-arquivo_dos_dados = 'poucos_dados.csv'
-arq_aux_dados = 'arquivo_aux.csv'
-poucos_dados = 'arquivo_dos_dados.csv'
+csv_entrada = 'arquivos/fifa_cards.csv'
+arquivo_dos_dados = 'arquivos/arquivo_dos_dados.csv'
+arq_aux_dados = 'arquivos/arquivo_aux.csv'
+poucos_dados = 'arquivos/poucos_dados.csv'
 
-lista_nacionalidades = 'lista_nac.csv'
-lista_clubes = 'lista_clubes.csv'
-lista_nomes = 'lista_nomes.csv'
-lista_overall = 'lista_overall.csv'
-lista_idade = 'lista_idade.csv'
+lista_nacionalidades = 'arquivos/lista_nac.csv'
+lista_clubes = 'arquivos/lista_clubes.csv'
+lista_nomes = 'arquivos/lista_nomes.csv'
+lista_overall = 'arquivos/lista_overall.csv'
+lista_idade = 'arquivos/lista_idade.csv'
+lista_meus_clubes = 'arquivos/lista_meus_clubes.csv'
 
 #Seleciona quais dados serão usados
-processar_csv(csv_entrada, arquivo_dos_dados)
+#processar_csv(csv_entrada, arquivo_dos_dados)
 
 #Inicializa/cria as árvores Trie
 arvoreTrie_nome_jogador = ArvoreTrie()
@@ -243,77 +161,90 @@ arvoreTrie_nacionalidade.criar_arvore_trie(coluna=4,arq_entrada=poucos_dados,arq
 arvoreTrie_clube = ArvoreTrie()
 arvoreTrie_clube.criar_arvore_trie(coluna=5, arq_entrada=poucos_dados, arq_saida=lista_clubes)
 
+
 arvoreB_overall = ArvoreB(3)
 arvoreB_idade = ArvoreB(3)
 arvore_b = ArvoreB(3)
 
-print('Se deseja buscar uma nacionalidade digite-a no campo de busca, ou tecle 1 para deixar o campo vazio\n')
-entrada_teclado = input('Campo de Pesquisa: ')
-##Faz a busca do que foi digitado nas arvores trie, caso encontrado -> Cria uma arvore b filtrando dos dados
-##gerais somente oq foi digitado no campo de pesquisa
 
-print('\nSelecione uma opção\n1.Ordenar por overall crescente\n2.Ordenar por overall decrescente\n'
-        '3.Ordenar por idade crescente\n4.Ordenar por idade decrescente\n')
-
-selecao_valida = False
-while(selecao_valida == False):
-    selecao_filtro = input()
-    if selecao_filtro == '1':
-        filtro = 'overall'
-        arvore_b = arvoreB_overall
-        lista = lista_overall
-        ordem = 'crescente'
+############### MENU ################### Não foi criada uma função menu() pois seriam mtos parametros para passar
+opcao_valida = False
+while(opcao_valida == False):
+    print('Selecione uma opção:\n'
+        '1. Criar time\n'
+        '2. Excluir time\n'
+        '3. Estatísticas\n')
+    opcao_menu = input()
     
-        selecao_valida = True
-    elif selecao_filtro == '2':
-        filtro = 'overall'
-        arvore_b = arvoreB_overall
-        lista = lista_overall
-        ordem = 'decrescente'
-
-        selecao_valida = True
-    elif selecao_filtro == '3':
-        filtro = 'age'
-        arvore_b = arvoreB_idade
-        lista = lista_idade
-        ordem = 'crescente'
-
-        selecao_valida = True
-    elif selecao_filtro == '4':
-        filtro = 'age'
-        arvore_b = arvoreB_idade
-        lista = lista_idade
-        ordem = 'decrescente'
-
-        selecao_valida = True
+    #Criar novo clube
+    if opcao_menu == '1':
+        opcao_valida == True
+        #Instacia um clube novo e da um nome à ele
+        novo_clube = Clube()
+        novo_clube.criar_clube(arvoreTrie_clube, lista_meus_clubes)
+        #Adiciona jogadores ao clube novo
+        buscar_jogador()
+        novo_clube.adicionar_jogador()
+          
+    elif opcao_menu == '2':
+        opcao_valida == True
+        tela_excluir_time()
+    elif opcao_menu == '3':
+        opcao_valida == True
+        tela_estatisticas()
     else:
-        print('Opção inválida!')
+        print('Opção inválida!\n')
 
 
-#Retorna true se a nacionalidade foi encontrada na lista de nacionalidades
-if arvoreTrie_nacionalidade.buscar(entrada_teclado) == True: 
-    #Cria arvore com base de dados na nacionalidade escolhida
-    prepara_aux_dados(arq_entrada=poucos_dados, coluna='nationality', entrada_teclado=entrada_teclado,arq_saida=arq_aux_dados)
-    arvore_b.criar_arvore_b(coluna=str(filtro), arq_entrada=arq_aux_dados, arq_saida=lista)
-    if ordem == 'crescente':
-        arvore_b.percorrer_e_imprimir_crescente()
-    if ordem == 'decrescente':
-        arvore_b.percorrer_e_imprimir_decrescente()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#### **** Não repete jogadores, mas não funciona para busca por prefixos - Pesquisa = Bra -> não encontra Brazil
+
+# #Retorna true se a nacionalidade foi encontrada na lista de nacionalidades
+# if arvoreTrie_nacionalidade.buscar(entrada_teclado) == True: 
+#     #Cria arvore com base de dados na nacionalidade escolhida
+#     prepara_aux_dados(arq_entrada=poucos_dados, coluna='nationality', entrada_teclado=entrada_teclado,arq_saida=arq_aux_dados)
+#     arvore_b.criar_arvore_b(coluna=str(filtro), arq_entrada=arq_aux_dados, arq_saida=lista)
+#     if ordem == 'crescente':
+#         arvore_b.percorrer_e_imprimir_crescente()
+#     if ordem == 'decrescente':
+#         arvore_b.percorrer_e_imprimir_decrescente()
         
-elif arvoreTrie_nome_jogador.buscar(entrada_teclado) == True:
-    #Cria arvore com base de dados do prefixo de nome escolhido
-    prepara_aux_dados(arq_entrada=poucos_dados, coluna='short_name', entrada_teclado=entrada_teclado,arq_saida=arq_aux_dados)
-    arvore_b.criar_arvore_b(coluna=str(filtro), arq_entrada=poucos_dados, arq_saida=lista)
-    if ordem == 'crescente':
-        arvore_b.percorrer_e_imprimir_crescente()
-    if ordem == 'decrescente':
-        arvore_b.percorrer_e_imprimir_decrescente()
+# elif arvoreTrie_nome_jogador.buscar(entrada_teclado) == True:
+#     #Cria arvore com base de dados do prefixo de nome escolhido
+#     prepara_aux_dados(arq_entrada=poucos_dados, coluna='short_name', entrada_teclado=entrada_teclado,arq_saida=arq_aux_dados)
+#     arvore_b.criar_arvore_b(coluna=str(filtro), arq_entrada=arq_aux_dados, arq_saida=lista)
+#     if ordem == 'crescente':
+#         arvore_b.percorrer_e_imprimir_crescente()
+#     if ordem == 'decrescente':
+#         arvore_b.percorrer_e_imprimir_decrescente()
 
-elif arvoreTrie_clube.buscar(entrada_teclado) == True:
-    #Cria arvore com base de dados do prefixo do clube escolhido
-    arvore_b.criar_arvore_b(coluna=str(filtro), arq_entrada=poucos_dados, arq_saida=lista)
-    prepara_aux_dados(arq_entrada=poucos_dados, coluna='club', entrada_teclado=entrada_teclado,arq_saida=arq_aux_dados)
-    if ordem == 'crescente':
-        arvore_b.percorrer_e_imprimir_crescente()
-    if ordem == 'decrescente':
-        arvore_b.percorrer_e_imprimir_decrescente()
+# elif arvoreTrie_clube.buscar(entrada_teclado) == True:
+#     #Cria arvore com base de dados do prefixo do clube escolhido
+#     prepara_aux_dados(arq_entrada=poucos_dados, coluna='club', entrada_teclado=entrada_teclado,arq_saida=arq_aux_dados)
+#     arvore_b.criar_arvore_b(coluna=str(filtro), arq_entrada=arq_aux_dados, arq_saida=lista)
+#     if ordem == 'crescente':
+#         arvore_b.percorrer_e_imprimir_crescente()
+#     if ordem == 'decrescente':
+#         arvore_b.percorrer_e_imprimir_decrescente()
