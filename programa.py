@@ -61,47 +61,43 @@ def buscar_jogador():
     while(selecao_valida == False):
         selecao_filtro = input()
         if selecao_filtro == '1':
-            filtro = 'overall'
-            arvore_b = arvoreB_overall
-            lista = lista_overall
-            ordem = 'crescente'
-        
+            arvoreB_overall_C = ArvoreB(3)
+            aplicar_filtros(entrada_teclado, filtro='overall', atributo='Overall', ordem='crescente', 
+                            lista=lista_overall, arvore_b=arvoreB_overall_C)
             selecao_valida = True
+
         elif selecao_filtro == '2':
-            filtro = 'overall'
-            arvore_b = arvoreB_overall
-            lista = lista_overall
-            ordem = 'decrescente'
-
+            arvoreB_overall_D = ArvoreB(3)
+            aplicar_filtros(entrada_teclado, filtro='overall', atributo='Overall', ordem='decrescente', 
+                            lista=lista_overall, arvore_b=arvoreB_overall_D)
             selecao_valida = True
+
         elif selecao_filtro == '3':
-            filtro = 'age'
-            arvore_b = arvoreB_idade
-            lista = lista_idade
-            ordem = 'crescente'
-
+            arvoreB_idade_C = ArvoreB(3)
+            aplicar_filtros(entrada_teclado, filtro='age', atributo='Idade', ordem='crescente', 
+                            lista=lista_idade, arvore_b=arvoreB_idade_C)
             selecao_valida = True
+
         elif selecao_filtro == '4':
-            filtro = 'age'
-            arvore_b = arvoreB_idade
-            lista = lista_idade
-            ordem = 'decrescente'
-
+            arvoreB_idade_D = ArvoreB(3)
+            aplicar_filtros(entrada_teclado, filtro='age', atributo='Idade', ordem='decrescente', 
+                            lista=lista_idade, arvore_b=arvoreB_idade_D)
             selecao_valida = True
+
         else:
             print('Opção inválida!')
         
-    aplicar_filtros(entrada_teclado, filtro, ordem, lista, arvore_b)
+    
 
 
-def aplicar_filtros(entrada_teclado, filtro, ordem, lista, arvore_b):
+def aplicar_filtros(entrada_teclado, filtro, atributo, ordem, lista, arvore_b):
     #### **** MELHORIA -> Pensar maneira pra nao repetir nomes - Pesquisa = in -> Schweinsteiger aparece 3x (?)
     if entrada_teclado == '':
         arvore_b.criar_arvore_b(coluna=str(filtro), arq_entrada=poucos_dados, arq_saida=lista)
         if ordem == 'crescente':
-            arvore_b.percorrer_e_imprimir_crescente()
+            arvore_b.percorrer_e_imprimir_crescente(atributo)
         if ordem == 'decrescente':
-            arvore_b.percorrer_e_imprimir_decrescente()
+            arvore_b.percorrer_e_imprimir_decrescente(atributo)
 
     else:
         palavras_encontradas = arvoreTrie_nome_jogador.buscar_substring(entrada_teclado)
@@ -110,27 +106,27 @@ def aplicar_filtros(entrada_teclado, filtro, ordem, lista, arvore_b):
             prep_arq_aux(arq_entrada=poucos_dados, coluna='short_name', strings=palavras_encontradas,arq_saida=arq_aux_dados)
             arvore_b.criar_arvore_b(coluna=str(filtro), arq_entrada=arq_aux_dados, arq_saida=lista)
             if ordem == 'crescente':
-                arvore_b.percorrer_e_imprimir_crescente()
+                arvore_b.percorrer_e_imprimir_crescente(atributo)
             if ordem == 'decrescente':
-                arvore_b.percorrer_e_imprimir_decrescente()
+                arvore_b.percorrer_e_imprimir_decrescente(atributo)
 
         palavras_encontradas = arvoreTrie_nacionalidade.buscar_substring(entrada_teclado)
         if palavras_encontradas != []:
             prep_arq_aux(arq_entrada=poucos_dados, coluna='nationality', strings=palavras_encontradas,arq_saida=arq_aux_dados)
             arvore_b.criar_arvore_b(coluna=str(filtro), arq_entrada=arq_aux_dados, arq_saida=lista)
             if ordem == 'crescente':
-                arvore_b.percorrer_e_imprimir_crescente()
+                arvore_b.percorrer_e_imprimir_crescente(atributo)
             if ordem == 'decrescente':
-                arvore_b.percorrer_e_imprimir_decrescente()
+                arvore_b.percorrer_e_imprimir_decrescente(atributo)
 
         palavras_encontradas = arvoreTrie_clube.buscar_substring(entrada_teclado)
         if palavras_encontradas != []:
             prep_arq_aux(arq_entrada=poucos_dados, coluna='club', strings=palavras_encontradas,arq_saida=arq_aux_dados)
             arvore_b.criar_arvore_b(coluna=str(filtro), arq_entrada=arq_aux_dados, arq_saida=lista)
             if ordem == 'crescente':
-                arvore_b.percorrer_e_imprimir_crescente()
+                arvore_b.percorrer_e_imprimir_crescente(atributo)
             if ordem == 'decrescente':
-                arvore_b.percorrer_e_imprimir_decrescente()
+                arvore_b.percorrer_e_imprimir_decrescente(atributo)
 
 
 ###################################### Inicio da aplicação ########################################
@@ -160,11 +156,6 @@ arvoreTrie_nacionalidade.criar_arvore_trie(coluna=4,arq_entrada=poucos_dados,arq
 
 arvoreTrie_clube = ArvoreTrie()
 arvoreTrie_clube.criar_arvore_trie(coluna=5, arq_entrada=poucos_dados, arq_saida=lista_clubes)
-
-
-arvoreB_overall = ArvoreB(3)
-arvoreB_idade = ArvoreB(3)
-arvore_b = ArvoreB(3)
 
 
 ############### MENU ################### Não foi criada uma função menu() pois seriam mtos parametros para passar
