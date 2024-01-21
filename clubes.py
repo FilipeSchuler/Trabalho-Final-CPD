@@ -1,6 +1,6 @@
 import csv
 
-class Clube():
+class Clube:
     def __init__(self):
         self.nome_clube = 'Inválido'
         self.numero_jogadores = 0
@@ -67,4 +67,3 @@ class Clube():
 
         self.numero_jogadores += 1
     
-

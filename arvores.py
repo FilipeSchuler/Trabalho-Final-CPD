@@ -1,4 +1,5 @@
 import csv
+from clubes import *
 
 MAX_IMPRESSOES_POR_PAG = 3
 
@@ -88,9 +89,13 @@ class ArvoreB:
                 self.obter_dados_arvore_b(filho, dados)
         return dados
 
-    def percorrer_e_imprimir_crescente(self, atributo):
-        self.percorrer_em_ordem_crescente(self.raiz, atributo, primeira_chamada=True)
-        self.indice_linhas = 1
+    def percorrer_e_imprimir_crescente(self, atributo, ordem):
+        if ordem == 'crescente':
+            self.percorrer_em_ordem_crescente(self.raiz, atributo, primeira_chamada=True)
+            self.indice_linhas = 1
+        elif ordem == 'decrescente':
+            self.percorrer_em_ordem_decrescente(self.raiz, atributo, primeira_chamada=True)
+            self.indice_linhas = 1
 
     def percorrer_em_ordem_crescente(self, no, atributo, primeira_chamada=True):
         if primeira_chamada:
@@ -127,10 +132,6 @@ class ArvoreB:
         else:
             print(f'{self.indice_linhas:<8}{nome_jogador:<20}{chave_arvore}')
             self.linhas_impressas += 1
-
-    def percorrer_e_imprimir_decrescente(self, atributo):
-        self.percorrer_em_ordem_decrescente(self.raiz, atributo, primeira_chamada=True)
-        self.indice_linhas = 1
 
     def percorrer_em_ordem_decrescente(self, no, atributo, primeira_chamada=True):
         if primeira_chamada:
