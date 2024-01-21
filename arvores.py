@@ -1,6 +1,6 @@
 import csv
 
-MAX_LINHAS = 5
+MAX_IMPRESSOES_POR_PAG = 3
 
 #Pra overall e idade
 class NoArvoreB:
@@ -14,6 +14,7 @@ class ArvoreB:
         self.raiz = NoArvoreB(eh_folha=True)
         self.t = t
         self.indice_linhas = 1
+        self.linhas_impressas = 0
     
     #Função de inserir nó na arvore e suas auxiliares
     def inserir(self, chave):
@@ -87,63 +88,53 @@ class ArvoreB:
                 self.obter_dados_arvore_b(filho, dados)
         return dados
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     def percorrer_e_imprimir_crescente(self, atributo):
         self.percorrer_em_ordem_crescente(self.raiz, atributo, primeira_chamada=True)
         self.indice_linhas = 1
 
     def percorrer_em_ordem_crescente(self, no, atributo, primeira_chamada=True):
         if primeira_chamada:
-            print(f'{"Índice":<8}{"Nome":<20}{atributo}')
-            print('-' * 35)  # Linha separadora
+            self.imprimir_cabecalho(atributo)
 
         if no is not None:
             i = 0
             while i < len(no.chaves):
-                # Se não é folha, visita o filho antes de visitar a chave
                 if not no.eh_folha:
                     self.percorrer_em_ordem_crescente(no.filhos[i], atributo, False)
-                
-                chave_info = no.chaves[i].split(',')  # Separar informações na string
-                nome_jogador = chave_info[1].strip()  # Obtém o nome do jogador
-                chave_arvore = chave_info[0].strip()  # Obtém a chave da árvore
-                
-                print(f'{self.indice_linhas:<8}{nome_jogador:<20}{chave_arvore}')
+
+                self.imprimir_chave(no.chaves[i])
+
                 i += 1
                 self.indice_linhas += 1
-            # Se não é folha, visita o último filho
+
             if not no.eh_folha:
                 self.percorrer_em_ordem_crescente(no.filhos[i], atributo, False)
 
+    def imprimir_cabecalho(self, atributo):
+        print(f'{"Índice":<8}{"Nome":<20}{atributo}')
+        print('-' * 35)  # Linha separadora
 
-    
+    def imprimir_chave(self, chave):
+        chave_info = chave.split(',')
+        nome_jogador = chave_info[1].strip()
+        chave_arvore = chave_info[0].strip()
+        
+        if self.linhas_impressas >= MAX_IMPRESSOES_POR_PAG:
+            if input('Se deseja imprimir a próxima página digite "s": ') == 's':
+                self.linhas_impressas = 0
+                print(f'{self.indice_linhas:<8}{nome_jogador:<20}{chave_arvore}')
+                self.linhas_impressas += 1
+        else:
+            print(f'{self.indice_linhas:<8}{nome_jogador:<20}{chave_arvore}')
+            self.linhas_impressas += 1
+
     def percorrer_e_imprimir_decrescente(self, atributo):
         self.percorrer_em_ordem_decrescente(self.raiz, atributo, primeira_chamada=True)
         self.indice_linhas = 1
 
     def percorrer_em_ordem_decrescente(self, no, atributo, primeira_chamada=True):
         if primeira_chamada:
-            self.indice_linhas = 1  # Reinicia o índice ao iniciar uma nova chamada
-            print(f'{"Índice":<8}{"Nome":<20}{atributo}')
-            print('-' * 35)  # Linha separadora
+            self.imprimir_cabecalho(atributo)
 
         if no is not None:
             i = len(no.chaves) - 1  # Iniciar do final para percorrer em ordem decrescente
@@ -152,42 +143,14 @@ class ArvoreB:
                 if not no.eh_folha:
                     self.percorrer_em_ordem_decrescente(no.filhos[i + 1], atributo, False)
                 
-                chave_info = no.chaves[i].split(',')  # Separar informações na string
-                nome_jogador = chave_info[1].strip()  # Obtém o nome do jogador
-                chave_arvore = chave_info[0].strip()  # Obtém a chave da árvore
-                
-                print(f'{self.indice_linhas:<8}{nome_jogador:<20}{chave_arvore}')
+                self.imprimir_chave(no.chaves[i])
+
                 i -= 1
                 self.indice_linhas += 1
 
             # Se não é folha, visita o primeiro filho
             if not no.eh_folha:
                 self.percorrer_em_ordem_decrescente(no.filhos[0], atributo, False)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #Pra nome, nacionalidade e clube
 class NoArvoreTrie:

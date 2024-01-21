@@ -161,7 +161,7 @@ arvoreTrie_clube.criar_arvore_trie(coluna=5, arq_entrada=poucos_dados, arq_saida
 ############### MENU ################### Não foi criada uma função menu() pois seriam mtos parametros para passar
 opcao_valida = False
 while(opcao_valida == False):
-    print('Selecione uma opção:\n'
+    print('\nSelecione uma opção:\n'
         '1. Criar time\n'
         '2. Excluir time\n'
         '3. Estatísticas\n')
