@@ -87,6 +87,25 @@ class ArvoreB:
                 self.obter_dados_arvore_b(filho, dados)
         return dados
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     def percorrer_e_imprimir_crescente(self, atributo):
         self.percorrer_em_ordem_crescente(self.raiz, atributo, primeira_chamada=True)
         self.indice_linhas = 1
@@ -122,6 +141,7 @@ class ArvoreB:
 
     def percorrer_em_ordem_decrescente(self, no, atributo, primeira_chamada=True):
         if primeira_chamada:
+            self.indice_linhas = 1  # Reinicia o índice ao iniciar uma nova chamada
             print(f'{"Índice":<8}{"Nome":<20}{atributo}')
             print('-' * 35)  # Linha separadora
 
@@ -130,7 +150,7 @@ class ArvoreB:
             while i >= 0:
                 # Se não é folha, visita o filho antes de visitar a chave
                 if not no.eh_folha:
-                    self.percorrer_em_ordem_decrescente(no.filhos[i], atributo, False)
+                    self.percorrer_em_ordem_decrescente(no.filhos[i + 1], atributo, False)
                 
                 chave_info = no.chaves[i].split(',')  # Separar informações na string
                 nome_jogador = chave_info[1].strip()  # Obtém o nome do jogador
@@ -139,9 +159,34 @@ class ArvoreB:
                 print(f'{self.indice_linhas:<8}{nome_jogador:<20}{chave_arvore}')
                 i -= 1
                 self.indice_linhas += 1
-            # Se não é folha, visita o último filho
+
+            # Se não é folha, visita o primeiro filho
             if not no.eh_folha:
-                self.percorrer_em_ordem_decrescente(no.filhos[len(no.chaves)], atributo, False)
+                self.percorrer_em_ordem_decrescente(no.filhos[0], atributo, False)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #Pra nome, nacionalidade e clube
