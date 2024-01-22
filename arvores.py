@@ -1,7 +1,11 @@
 import csv
 from clubes import *
+from arquivos import *
 
 MAX_IMPRESSOES_POR_PAG = 3
+
+
+
 
 #Pra overall e idade
 class NoArvoreB:
@@ -60,14 +64,9 @@ class ArvoreB:
 
     def criar_arvore_b(self, coluna, arq_entrada, arq_saida):
         chaves = []
-
-        with open(arq_entrada, 'r', newline='', encoding='utf-8') as arq_csv:
-                # Cria um objeto leitor CSV - uso da biblioteca csv
-                ler_csv = csv.DictReader(arq_csv)
-
-                for col in ler_csv:
-                    info_selecionadas = [col[coluna], col['short_name'], col['sofifa_id']]
-                    chaves.append(','.join(info_selecionadas))
+        manipulador_arq = Arquivos()
+        colunas_desejadas = [str(coluna), 'short_name', 'sofifa_id']
+        chaves = manipulador_arq.ler_arquivo_csv(arq_entrada, colunas_desejadas)
 
         for chave in chaves:
             self.inserir(chave)
@@ -76,6 +75,74 @@ class ArvoreB:
         with open(arq_saida, 'w', newline='', encoding='utf-8') as arq_csv:
             writer = csv.writer(arq_csv)
             writer.writerows(dados_arvore)
+
+
+
+
+
+
+
+
+
+
+
+
+    def buscar_em_arvores(self, campo_pesquisa, opcao_filtro):
+        jogadores_encontrados = []
+
+        if campo_pesquisa == '':
+            jogadores_encontrados = self.inserindo_filtros_em_busca(opcao_filtro, POUCOS_DADOS)
+        else:
+            nomes_encontrados = arvoreTrie_nome_jogador.buscar_substring(campo_pesquisa)
+            clubes_encontrados = arvoreTrie_clube.buscar_substring(campo_pesquisa)
+            nacionalidades_encontradas = arvoreTrie_nacionalidade.buscar_substring(campo_pesquisa)
+            
+            if nomes_encontrados != []:
+                print(f"Palavras que contêm a substring '{campo_pesquisa}': {nomes_encontrados}")
+                manipulador_arq.prep_arq_aux(arq_entrada=POUCOS_DADOS, coluna='short_name',
+                                              strings=nomes_encontrados,arq_saida=ARQUIVO_AUXILIAR)
+                jogadores_encontrados = self.inserindo_filtros_em_busca(opcao_filtro, ARQUIVO_AUXILIAR)
+            
+            elif clubes_encontrados != []:
+                print(f"Palavras que contêm a substring '{campo_pesquisa}': {clubes_encontrados}")
+                manipulador_arq.prep_arq_aux(arq_entrada=POUCOS_DADOS, coluna='club', 
+                                             strings=clubes_encontrados,arq_saida=ARQUIVO_AUXILIAR)
+                jogadores_encontrados = self.inserindo_filtros_em_busca(opcao_filtro, ARQUIVO_AUXILIAR)
+            
+            elif nacionalidades_encontradas != []:
+                print(f"Palavras que contêm a substring '{campo_pesquisa}': {nacionalidades_encontradas}")
+                manipulador_arq.prep_arq_aux(arq_entrada=POUCOS_DADOS, coluna='nationality', 
+                                             strings=nacionalidades_encontradas,arq_saida=ARQUIVO_AUXILIAR)
+                jogadores_encontrados = self.inserindo_filtros_em_busca(opcao_filtro, ARQUIVO_AUXILIAR)
+            
+        return jogadores_encontrados
+
+    def inserindo_filtros_em_busca(self, opcao_filtro, arq_entrada):
+        if opcao_filtro == '1':
+            arvoreB_overall_D = ArvoreB(3)
+            arvoreB_overall_D.criar_arvore_b('overall', arq_entrada, ARVORE_OVERALL)
+            return arvoreB_overall_D.obter_dados_arvore_b()
+        elif opcao_filtro == '2':
+            arvoreB_overall_C = ArvoreB(3)
+            arvoreB_overall_C.criar_arvore_b('overall', arq_entrada, ARVORE_OVERALL)
+            return arvoreB_overall_C.obter_dados_arvore_b()
+        
+        elif opcao_filtro == '3':
+            arvoreB_idade_D = ArvoreB(3)
+            arvoreB_idade_D.criar_arvore_b('age', arq_entrada, ARVORE_IDADE)
+            return arvoreB_idade_D.obter_dados_arvore_b()
+        elif opcao_filtro == '4':
+            arvoreB_idade_C = ArvoreB(3)
+            arvoreB_idade_C.criar_arvore_b('age', arq_entrada, ARVORE_IDADE)
+            return arvoreB_idade_C.obter_dados_arvore_b()
+
+
+
+
+
+
+
+
 
 
     def obter_dados_arvore_b(self, no=None, dados=None):
@@ -89,7 +156,8 @@ class ArvoreB:
                 self.obter_dados_arvore_b(filho, dados)
         return dados
 
-    def percorrer_e_imprimir_crescente(self, atributo, ordem):
+    def percorrer_e_imprimir(self, atributo, ordem):
+        print('CHAMOU FUNCAO')
         if ordem == 'crescente':
             self.percorrer_em_ordem_crescente(self.raiz, atributo, primeira_chamada=True)
             self.indice_linhas = 1
@@ -115,23 +183,6 @@ class ArvoreB:
             if not no.eh_folha:
                 self.percorrer_em_ordem_crescente(no.filhos[i], atributo, False)
 
-    def imprimir_cabecalho(self, atributo):
-        print(f'{"Índice":<8}{"Nome":<20}{atributo}')
-        print('-' * 35)  # Linha separadora
-
-    def imprimir_chave(self, chave):
-        chave_info = chave.split(',')
-        nome_jogador = chave_info[1].strip()
-        chave_arvore = chave_info[0].strip()
-        
-        if self.linhas_impressas >= MAX_IMPRESSOES_POR_PAG:
-            if input('Se deseja imprimir a próxima página digite "s": ') == 's':
-                self.linhas_impressas = 0
-                print(f'{self.indice_linhas:<8}{nome_jogador:<20}{chave_arvore}')
-                self.linhas_impressas += 1
-        else:
-            print(f'{self.indice_linhas:<8}{nome_jogador:<20}{chave_arvore}')
-            self.linhas_impressas += 1
 
     def percorrer_em_ordem_decrescente(self, no, atributo, primeira_chamada=True):
         if primeira_chamada:
@@ -152,6 +203,24 @@ class ArvoreB:
             # Se não é folha, visita o primeiro filho
             if not no.eh_folha:
                 self.percorrer_em_ordem_decrescente(no.filhos[0], atributo, False)
+    
+    def imprimir_cabecalho(self, atributo):
+        print(f'{"Índice":<8}{"Nome":<20}{atributo}')
+        print('-' * 35)  # Linha separadora
+
+    def imprimir_chave(self, chave):
+        chave_info = chave.split(',')
+        nome_jogador = chave_info[1].strip()
+        chave_arvore = chave_info[0].strip()
+        
+        if self.linhas_impressas >= MAX_IMPRESSOES_POR_PAG:
+            if input('Se deseja imprimir a próxima página digite "s": ') == 's':
+                self.linhas_impressas = 0
+                print(f'{self.indice_linhas:<8}{nome_jogador:<20}{chave_arvore}')
+                self.linhas_impressas += 1
+        else:
+            print(f'{self.indice_linhas:<8}{nome_jogador:<20}{chave_arvore}')
+            self.linhas_impressas += 1
 
 #Pra nome, nacionalidade e clube
 class NoArvoreTrie:
@@ -182,7 +251,7 @@ class ArvoreTrie:
         with open(arq_saida, 'w', newline='', encoding='utf-8') as arq_csv:
             writer = csv.writer(arq_csv)
             writer.writerows(dados_arvore)
-    
+
     def buscar(self, palavra):
         no = self.raiz
         for char in palavra:
@@ -222,3 +291,15 @@ class ArvoreTrie:
             print(palavra)
         for char, prox_no in no.filhos.items():
             self.imprimir(prox_no, palavra + char)
+
+
+
+#Inicializa/cria as árvores Trie
+arvoreTrie_nome_jogador = ArvoreTrie()
+arvoreTrie_nome_jogador.criar_arvore_trie(coluna=1, arq_entrada=POUCOS_DADOS, arq_saida=LISTA_TODOS_NOMES)
+
+arvoreTrie_nacionalidade = ArvoreTrie()
+arvoreTrie_nacionalidade.criar_arvore_trie(coluna=4,arq_entrada=POUCOS_DADOS,arq_saida=TODAS_NACIONALIDADES)
+
+arvoreTrie_clube = ArvoreTrie()
+arvoreTrie_clube.criar_arvore_trie(coluna=5, arq_entrada=POUCOS_DADOS, arq_saida=LISTA_TODOS_CLUBES)
