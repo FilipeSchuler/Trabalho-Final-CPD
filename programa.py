@@ -9,22 +9,44 @@ from paginas import *
 
 
 def tela_criar_time():
-    arvore_b = ArvoreB(3)  #Instancia uma árvore de jogadores para cada clube 
+    #arvore_b = ArvoreB(3)  #Instancia uma árvore de jogadores para cada clube 
                                 #isso facilita a busca de dados para cada clube
     
 
-    novo_clube = Clube(arvore_b)        #Instacia um clube novo e da um nome à ele
+    novo_clube = Clube()        #Instacia um clube novo e da um nome à ele
     novo_clube.adicionar_clube_em_lista(arvoreTrie_clube, LISTA_MEUS_CLUBES)        #Adiciona clube em meus clubes
     novo_clube.adicionar_jogador()         #Adiciona jogadores ao clube novo
 
-def tela_adicionar_jogador():
-    print('\nTela escolha jogador\n')
-
 def tela_excluir_time():
-    print('\nTela excluir jogadorer\n')
+    print('\nLista de times criados:\n')
+
+    manipulador_arq.imprimir_lista_meus_clubes() 
+    
+    nome_time_para_excluir = input('\nDigite o nome do time que você deseja excluir: ')
+
+    time_valido = manipulador_arq.compara_nome_com_lista(LISTA_MEUS_CLUBES, nome_time_para_excluir, 'meus_clubes')
+
+    if time_valido == True:
+        #implementar logica excluir time
+        print(f'\nTime "{nome_time_para_excluir}" excluido!\n')
+    else:
+        print('Esse time não existe!\n')
+
+    
 
 def tela_estatisticas():
     print('\nTela estatísticas\n')
+    manipulador_arq.imprimir_lista_meus_clubes() 
+    
+    nome_time_para_estatisticas = input('\nDigite o nome do time que você deseja ver as estatísticas: ')
+
+    time_valido = manipulador_arq.compara_nome_com_lista(LISTA_MEUS_CLUBES, nome_time_para_estatisticas, 'meus_clubes')
+
+    if time_valido == True:
+        print(f'\nEstatísticas do time "{nome_time_para_estatisticas}":\n')
+        #implementar logica para calcular estatisticas do time
+    else:
+        print('Esse time não existe!\n')
 
 
 

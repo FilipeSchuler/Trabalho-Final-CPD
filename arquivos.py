@@ -53,7 +53,25 @@ class Arquivos:
         
 
 
+    def imprimir_lista_meus_clubes(self):
+        with open(LISTA_MEUS_CLUBES, 'r', newline='', encoding='utf-8') as arq_csv:
+                leitor_csv = csv.DictReader(arq_csv)
+                for linha in leitor_csv:
+                    print(f'{linha['meus_clubes']}')
 
+
+    def compara_nome_com_lista(self, lista, nome, coluna):
+        igualdade_encontrada = False
+
+        with open(lista, 'r', newline='', encoding='utf-8') as arq_csv:
+                leitor_csv = csv.DictReader(arq_csv)
+                for linha in leitor_csv:
+                    if linha[coluna] == nome:
+                        print('Já existe um time com esse nome!\n')
+                        print('Digite o nome do seu time: ')
+                        igualdade_encontrada = True
+                        break
+        return igualdade_encontrada
 
 
     #Acho q não vai ser feito

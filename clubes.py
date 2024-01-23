@@ -3,12 +3,14 @@ from arquivos import *
 from arvores import *
 from paginas import *
 
+TOTAL_JOGADORES_POR_CLUBE = 3
+
 class Clube:
-    def __init__(self, arvore_b):
+    def __init__(self):
         self.nome_clube = 'Inválido'
-        self.lista_jogadores = []
         self.numero_jogadores = 0
-        self.arvore_jogadores = arvore_b
+        self.arvore_trie_jogadores = ArvoreTrie()
+        self.arvore_jogadores = ArvoreB(3)
 
 
     def adicionar_clube_em_lista(self, arvore_times, lista):
@@ -63,8 +65,8 @@ class Clube:
         #1- Buscar jogador
         #   -Campo de busca (nome parcial, nacionalidade ou clube parcial) + Filtro (overall ou idade,ambos crescentes ou decrescentes)
         #receber como retorno o nome do jogador e seus dados
-        
-        while self.numero_jogadores < 11:
+        jogadores_adicionados = []
+        while self.numero_jogadores < TOTAL_JOGADORES_POR_CLUBE:
             #Buscas por campo de pesquisa e filtros
             arvore_jogadores_encontrados = ArvoreB(3)
             campo_pesquisa = input('Digite arvore_b.um nome, uma nacionalidade ou um clube:\nCampo de Pesquisa: ')
@@ -74,7 +76,7 @@ class Clube:
             jogadores_encontrados = self.buscar_jogadores(campo_pesquisa, opcao_filtro, arvore_jogadores_encontrados)
             print(f'\nID DO JOGADOR ESCOLHIDO {jogadores_encontrados}\n')
             
-            jogador_escolhido = self.escolher_jogador(opcao_filtro, jogadores_encontrados, arvore_jogadores_encontrados)
+            jogador_escolhido = self.escolher_jogador(opcao_filtro, arvore_jogadores_encontrados)
             
 
             if jogador_escolhido == 'imprimir':
@@ -86,11 +88,17 @@ class Clube:
                 print('\nENTROU ONDE DEVIA E PROXIMA LINHA DEVE SER CAMPO DE PESQUISA\n\n')
                 continue
             
-
             else:
-                self.numero_jogadores += 1
-                print(f'\nID JOGADOR ESCOLHIDO: {jogador_escolhido} - NUM JOGADORES NO MEU CLUBE -{self.numero_jogadores}\n')
+                jogador_valido = verifica_id_do_jogador(jogadores_encontrados, jogador_escolhido)
+                if jogador_valido:
+                    jogadores_adicionados.append(jogador_escolhido)
+                    self.numero_jogadores += 1
+                    print(f'\nID JOGADOR ESCOLHIDO: {jogador_escolhido} | NUM JOGADORES NO MEU CLUBE: {self.numero_jogadores}\n')
+                else:
+                    print('O ID fornecido não foi encontrado!')
                 continue
+        
+        self.arvore_jogadores.criar_arvore_b('overall', POUCOS_DADOS, 'arquivos/arq_teste.csv')
 
         
 
@@ -102,48 +110,55 @@ class Clube:
         
 
 
-    def escolher_jogador(self, opcao_filtro, jogadores_encontrados, arvore_jogadores_encontrados):
-        jogador_escolhido = False
-        while jogador_escolhido == False:
+    def escolher_jogador(self, opcao_filtro, arvore_jogadores_encontrados):
             
-            if opcao_filtro == '1':
-                escolha_usuario = percorrer_e_imprimir(arvore_jogadores_encontrados.raiz, 'overall', 'decrescente')
-            elif opcao_filtro == '2':
-                escolha_usuario = percorrer_e_imprimir(arvore_jogadores_encontrados.raiz, 'overall', 'crescente')
-            elif opcao_filtro == '3':
-                escolha_usuario = percorrer_e_imprimir(arvore_jogadores_encontrados.raiz, 'age', 'decrescente')
-            elif opcao_filtro == '4':
-                escolha_usuario = percorrer_e_imprimir(arvore_jogadores_encontrados.raiz, 'age', 'crescente')
+        if opcao_filtro == '1':
+            escolha_usuario = percorrer_e_imprimir(arvore_jogadores_encontrados.raiz, 'overall', 'decrescente')
+        elif opcao_filtro == '2':
+            escolha_usuario = percorrer_e_imprimir(arvore_jogadores_encontrados.raiz, 'overall', 'crescente')
+        elif opcao_filtro == '3':
+            escolha_usuario = percorrer_e_imprimir(arvore_jogadores_encontrados.raiz, 'age', 'decrescente')
+        elif opcao_filtro == '4':
+            escolha_usuario = percorrer_e_imprimir(arvore_jogadores_encontrados.raiz, 'age', 'crescente')
 
-            # # Verificar se a busca foi interrompida devido à paginação
-            # escolha_usuario = controle_paginas.paginacao()
+        # # Verificar se a busca foi interrompida devido à paginação
+        # escolha_usuario = controle_paginas.paginacao()
 
-            #print(f'\nESCOLHA NA FUNÇÃO ESCOLHER{escolha_usuario}\n')
+        #print(f'\nESCOLHA NA FUNÇÃO ESCOLHER{escolha_usuario}\n')
 
-            if escolha_usuario == 'nova_busca':
-                # Voltar ao início do loop para uma nova busca
-                return 'nova_busca'
-            elif escolha_usuario == 'imprimir':
-                return 'imprimir'
-            else:
-                # Retornar o ID do jogador e sair do loop
-                for col in jogadores_encontrados:  # 2 é o índice que contém os IDs dos jogadores na lista
-                    for ident in col:  # Agora, iteramos diretamente sobre os elementos da sublist
-                        # Divide a string em partes usando a vírgula como delimitador
-                        partes = ident.split(',')
-                        # Extrai a ID do jogador
-                        id_jogador = partes[2]
-                        # Compara com a escolha do usuário
-                        if id_jogador == str(escolha_usuario):
-                            jogador_escolhido = True
-                            break  # Se encontrado, sai do loop interno
-                    if jogador_escolhido:
-                        break  # Se encontrado, sai do loop externo
-                print('O ID fornecido não foi encontrado!')
+        if escolha_usuario == 'nova_busca':
+            # Voltar ao início do loop para uma nova busca
+            return 'nova_busca'
+        elif escolha_usuario == 'imprimir':
+            return 'imprimir'
+        else:
+            # Retornar o ID do jogador e sair do loop
+            return escolha_usuario
+                
 
         
-        return escolha_usuario
+        
     
+
+def verifica_id_do_jogador(jogadores_encontrados, jogador_escolhido):
+    jogador_valido = False
+
+    for col in jogadores_encontrados:  # 2 é o índice que contém os IDs dos jogadores na lista
+        for ident in col:  # Agora, iteramos diretamente sobre os elementos da sublist
+            # Divide a string em partes usando a vírgula como delimitador
+            partes = ident.split(',')
+            # Extrai a ID do jogador
+            id_jogador = partes[2]
+            # Compara com a escolha do usuário
+            if id_jogador == str(jogador_escolhido):
+                jogador_valido = True
+                break  # Se encontrado, sai do loop interno
+        if jogador_valido:
+            break  # Se encontrado, sai do loop externo
+    return jogador_valido
+
+
+
 def selecionar_filtro():
     opcao_valida = False
     while opcao_valida == False:
