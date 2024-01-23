@@ -126,8 +126,6 @@ class Clube:
             elif escolha_usuario == 'imprimir':
                 return 'imprimir'
             else:
-                #print(f'\nLISTA DE JOGADORES ENCONTRADOS{jogadores_encontrados}\n')
-                #print(f'\nESCOLHA NA FUNÇÃO ESCOLHER{jogadores_encontrados[2]}\n')
                 # Retornar o ID do jogador e sair do loop
                 for col in jogadores_encontrados:  # 2 é o índice que contém os IDs dos jogadores na lista
                     for ident in col:  # Agora, iteramos diretamente sobre os elementos da sublist
@@ -136,11 +134,12 @@ class Clube:
                         # Extrai a ID do jogador
                         id_jogador = partes[2]
                         # Compara com a escolha do usuário
-                        if id_jogador == escolha_usuario:
+                        if id_jogador == str(escolha_usuario):
                             jogador_escolhido = True
                             break  # Se encontrado, sai do loop interno
                     if jogador_escolhido:
                         break  # Se encontrado, sai do loop externo
+                print('O ID fornecido não foi encontrado!')
 
         
         return escolha_usuario
