@@ -1,9 +1,5 @@
 import csv
-from clubes import *
 from arquivos import *
-
-MAX_IMPRESSOES_POR_PAG = 3
-
 
 
 
@@ -66,7 +62,7 @@ class ArvoreB:
         chaves = []
         manipulador_arq = Arquivos()
         colunas_desejadas = [str(coluna), 'short_name', 'sofifa_id']
-        chaves = manipulador_arq.ler_arquivo_csv(arq_entrada, colunas_desejadas)
+        chaves = manipulador_arq.ler_arquivo_csv(arq_entrada, colunas_desejadas, ler_cabecalho=False)
 
         for chave in chaves:
             self.inserir(chave)
@@ -119,22 +115,18 @@ class ArvoreB:
 
     def inserindo_filtros_em_busca(self, opcao_filtro, arq_entrada):
         if opcao_filtro == '1':
-            arvoreB_overall_D = ArvoreB(3)
-            arvoreB_overall_D.criar_arvore_b('overall', arq_entrada, ARVORE_OVERALL)
-            return arvoreB_overall_D.obter_dados_arvore_b()
+            self.criar_arvore_b('overall', arq_entrada, ARVORE_OVERALL)
+            return self.obter_dados_arvore_b()
         elif opcao_filtro == '2':
-            arvoreB_overall_C = ArvoreB(3)
-            arvoreB_overall_C.criar_arvore_b('overall', arq_entrada, ARVORE_OVERALL)
-            return arvoreB_overall_C.obter_dados_arvore_b()
+            self.criar_arvore_b('overall', arq_entrada, ARVORE_OVERALL)
+            return self.obter_dados_arvore_b()
         
         elif opcao_filtro == '3':
-            arvoreB_idade_D = ArvoreB(3)
-            arvoreB_idade_D.criar_arvore_b('age', arq_entrada, ARVORE_IDADE)
-            return arvoreB_idade_D.obter_dados_arvore_b()
+            self.criar_arvore_b('age', arq_entrada, ARVORE_IDADE)
+            return self.obter_dados_arvore_b()
         elif opcao_filtro == '4':
-            arvoreB_idade_C = ArvoreB(3)
-            arvoreB_idade_C.criar_arvore_b('age', arq_entrada, ARVORE_IDADE)
-            return arvoreB_idade_C.obter_dados_arvore_b()
+            self.criar_arvore_b('age', arq_entrada, ARVORE_IDADE)
+            return self.obter_dados_arvore_b()
 
 
 
@@ -156,71 +148,7 @@ class ArvoreB:
                 self.obter_dados_arvore_b(filho, dados)
         return dados
 
-    def percorrer_e_imprimir(self, atributo, ordem):
-        print('CHAMOU FUNCAO')
-        if ordem == 'crescente':
-            self.percorrer_em_ordem_crescente(self.raiz, atributo, primeira_chamada=True)
-            self.indice_linhas = 1
-        elif ordem == 'decrescente':
-            self.percorrer_em_ordem_decrescente(self.raiz, atributo, primeira_chamada=True)
-            self.indice_linhas = 1
-
-    def percorrer_em_ordem_crescente(self, no, atributo, primeira_chamada=True):
-        if primeira_chamada:
-            self.imprimir_cabecalho(atributo)
-
-        if no is not None:
-            i = 0
-            while i < len(no.chaves):
-                if not no.eh_folha:
-                    self.percorrer_em_ordem_crescente(no.filhos[i], atributo, False)
-
-                self.imprimir_chave(no.chaves[i])
-
-                i += 1
-                self.indice_linhas += 1
-
-            if not no.eh_folha:
-                self.percorrer_em_ordem_crescente(no.filhos[i], atributo, False)
-
-
-    def percorrer_em_ordem_decrescente(self, no, atributo, primeira_chamada=True):
-        if primeira_chamada:
-            self.imprimir_cabecalho(atributo)
-
-        if no is not None:
-            i = len(no.chaves) - 1  # Iniciar do final para percorrer em ordem decrescente
-            while i >= 0:
-                # Se não é folha, visita o filho antes de visitar a chave
-                if not no.eh_folha:
-                    self.percorrer_em_ordem_decrescente(no.filhos[i + 1], atributo, False)
-                
-                self.imprimir_chave(no.chaves[i])
-
-                i -= 1
-                self.indice_linhas += 1
-
-            # Se não é folha, visita o primeiro filho
-            if not no.eh_folha:
-                self.percorrer_em_ordem_decrescente(no.filhos[0], atributo, False)
     
-    def imprimir_cabecalho(self, atributo):
-        print(f'{"Índice":<8}{"Nome":<20}{atributo}')
-        print('-' * 35)  # Linha separadora
-
-    def imprimir_chave(self, chave):
-        chave_info = chave.split(',')
-        nome_jogador = chave_info[1].strip()
-        chave_arvore = chave_info[0].strip()
-        
-        if self.linhas_impressas >= MAX_IMPRESSOES_POR_PAG:
-            if input('Se deseja imprimir a próxima página digite "s": ') == 's':
-                self.linhas_impressas = 0
-                print(f'{self.indice_linhas:<8}{nome_jogador:<20}{chave_arvore}')
-                self.linhas_impressas += 1
-        else:
-            print(f'{self.indice_linhas:<8}{nome_jogador:<20}{chave_arvore}')
-            self.linhas_impressas += 1
 
 #Pra nome, nacionalidade e clube
 class NoArvoreTrie:

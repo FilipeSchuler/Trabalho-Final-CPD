@@ -1,6 +1,7 @@
 import csv
 from arquivos import *
 from arvores import *
+from paginas import *
 
 class Clube:
     def __init__(self, arvore_b):
@@ -15,7 +16,7 @@ class Clube:
         meus_clubes = []
         #Le clubes já criado para reescreve-los adicionados do novo clube criado
         coluna_desejada = ['meus_clubes']
-        meus_clubes = manipulador_arq.ler_arquivo_csv(lista, coluna_desejada)
+        meus_clubes = manipulador_arq.ler_arquivo_csv(lista, coluna_desejada, ler_cabecalho=True)
 
         if self.nome_clube not in meus_clubes:
             meus_clubes.append(self.nome_clube)
@@ -62,24 +63,87 @@ class Clube:
         #1- Buscar jogador
         #   -Campo de busca (nome parcial, nacionalidade ou clube parcial) + Filtro (overall ou idade,ambos crescentes ou decrescentes)
         #receber como retorno o nome do jogador e seus dados
-        jogadores_encontrados = self.buscar_jogador()
-        print(jogadores_encontrados)
         
-        #self.lista_jogadores.append(jogador_encontrado) #append retorno da função de busca
-        
-        self.numero_jogadores += 1
+        while self.numero_jogadores < 11:
+            #Buscas por campo de pesquisa e filtros
+            arvore_jogadores_encontrados = ArvoreB(3)
+            campo_pesquisa = input('Digite arvore_b.um nome, uma nacionalidade ou um clube:\nCampo de Pesquisa: ')
+            opcao_filtro = selecionar_filtro()
+            
+            #Busca na árvore conforme os filtros e retorna uma lista de jogadores que se enquadram
+            jogadores_encontrados = self.buscar_jogadores(campo_pesquisa, opcao_filtro, arvore_jogadores_encontrados)
+            print(f'\nID DO JOGADOR ESCOLHIDO {jogadores_encontrados}\n')
+            
+            jogador_escolhido = self.escolher_jogador(opcao_filtro, jogadores_encontrados, arvore_jogadores_encontrados)
+            
 
-    def buscar_jogador(self):
-        campo_pesquisa = input('Digite um nome, uma nacionalidade ou um clube:\nCampo de Pesquisa: ')
-        
-        opcao_filtro = selecionar_filtro()
+            if jogador_escolhido == 'imprimir':
+                jogador_escolhido = input('Se deseja adicionar algum jogador digite seu ID\n'
+                                          'Se deseja fazer uma nova busca tecle "b"\n')
+            #'b' por causa que a escolha do usuario dps de imprimir todos jogadores só é feita logo acima
+            if jogador_escolhido == 'b' or jogador_escolhido == 'nova_busca': 
+                                         
+                print('\nENTROU ONDE DEVIA E PROXIMA LINHA DEVE SER CAMPO DE PESQUISA\n\n')
+                continue
+            
 
-        jogadores_encontrados = self.arvore_jogadores.buscar_em_arvores(campo_pesquisa, opcao_filtro)
-        if opcao_filtro == '1':
-            print(self.arvore_jogadores.obter_dados_arvore_b())
-            self.arvore_jogadores.percorrer_e_imprimir('overall', 'decrescente')
+            else:
+                self.numero_jogadores += 1
+                print(f'\nID JOGADOR ESCOLHIDO: {jogador_escolhido} - NUM JOGADORES NO MEU CLUBE -{self.numero_jogadores}\n')
+                continue
+
+        
+
+    def buscar_jogadores(self, campo_pesquisa, opcao_filtro, arvore_jogadores_encontrados):
+
+        jogadores_encontrados = arvore_jogadores_encontrados.buscar_em_arvores(campo_pesquisa, opcao_filtro)
 
         return jogadores_encontrados
+        
+
+
+    def escolher_jogador(self, opcao_filtro, jogadores_encontrados, arvore_jogadores_encontrados):
+        jogador_escolhido = False
+        while jogador_escolhido == False:
+            
+            if opcao_filtro == '1':
+                escolha_usuario = percorrer_e_imprimir(arvore_jogadores_encontrados.raiz, 'overall', 'decrescente')
+            elif opcao_filtro == '2':
+                escolha_usuario = percorrer_e_imprimir(arvore_jogadores_encontrados.raiz, 'overall', 'crescente')
+            elif opcao_filtro == '3':
+                escolha_usuario = percorrer_e_imprimir(arvore_jogadores_encontrados.raiz, 'age', 'decrescente')
+            elif opcao_filtro == '4':
+                escolha_usuario = percorrer_e_imprimir(arvore_jogadores_encontrados.raiz, 'age', 'crescente')
+
+            # # Verificar se a busca foi interrompida devido à paginação
+            # escolha_usuario = controle_paginas.paginacao()
+
+            #print(f'\nESCOLHA NA FUNÇÃO ESCOLHER{escolha_usuario}\n')
+
+            if escolha_usuario == 'nova_busca':
+                # Voltar ao início do loop para uma nova busca
+                return 'nova_busca'
+            elif escolha_usuario == 'imprimir':
+                return 'imprimir'
+            else:
+                #print(f'\nLISTA DE JOGADORES ENCONTRADOS{jogadores_encontrados}\n')
+                #print(f'\nESCOLHA NA FUNÇÃO ESCOLHER{jogadores_encontrados[2]}\n')
+                # Retornar o ID do jogador e sair do loop
+                for col in jogadores_encontrados:  # 2 é o índice que contém os IDs dos jogadores na lista
+                    for ident in col:  # Agora, iteramos diretamente sobre os elementos da sublist
+                        # Divide a string em partes usando a vírgula como delimitador
+                        partes = ident.split(',')
+                        # Extrai a ID do jogador
+                        id_jogador = partes[2]
+                        # Compara com a escolha do usuário
+                        if id_jogador == escolha_usuario:
+                            jogador_escolhido = True
+                            break  # Se encontrado, sai do loop interno
+                    if jogador_escolhido:
+                        break  # Se encontrado, sai do loop externo
+
+        
+        return escolha_usuario
     
 def selecionar_filtro():
     opcao_valida = False

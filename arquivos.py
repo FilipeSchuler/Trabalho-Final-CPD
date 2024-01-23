@@ -14,19 +14,22 @@ ARVORE_OVERALL = 'arquivos/lista_overall.csv'
 ARVORE_IDADE = 'arquivos/lista_idade.csv'
 LISTA_MEUS_CLUBES = 'arquivos/lista_meus_clubes.csv'
 
+ARVORE_JOGADORES_MEU_CLUBE = 'arquivos/jog_meu_clube.csv'
+
 
 class Arquivos:
     
     #Exemplo de entrada para lista_de_colunas_desejadas ->atribuir valores à uma lista = ['short_name', 'age'] 
     #E depois passar a lista como parâmetro
-    def ler_arquivo_csv(self, csv_entrada, lista_de_colunas_desejadas):
+    def ler_arquivo_csv(self, csv_entrada, lista_de_colunas_desejadas, ler_cabecalho):
         conteudo_do_csv = []
 
         with open(csv_entrada, 'r', newline='', encoding='utf-8') as arq_csv:
             leitura_csv = csv.DictReader(arq_csv)
             
-            # Adiciona o cabeçalho ao arquivo
-            conteudo_do_csv.append(','.join(lista_de_colunas_desejadas))
+            if ler_cabecalho == True:
+                # Adiciona o cabeçalho ao arquivo
+                conteudo_do_csv.append(','.join(lista_de_colunas_desejadas))
             
             for col in leitura_csv:
                 # Obtém os valores das colunas desejadas
@@ -34,7 +37,8 @@ class Arquivos:
                 conteudo_do_csv.append(','.join(info_selecionadas))
 
         return conteudo_do_csv
-    
+
+
     def escrever_lista_em_csv(self, csv_saida, lista_de_dados):
         with open(csv_saida, 'w', encoding='utf-8') as arq_csv:
             for info in lista_de_dados:
@@ -43,7 +47,7 @@ class Arquivos:
 
     def processar_csv(self, csv_entrada, csv_saida, lista_de_colunas_desejadas):
         informacoes_desejadas = []
-        informacoes_desejadas = self.ler_arquivo_csv(csv_entrada, lista_de_colunas_desejadas)
+        informacoes_desejadas = self.ler_arquivo_csv(csv_entrada, lista_de_colunas_desejadas, ler_cabecalho=True)
 
         self.escrever_lista_em_csv(csv_saida, informacoes_desejadas)
         

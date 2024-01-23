@@ -1,6 +1,7 @@
 from arvores import *
 from clubes import *
 from arquivos import *
+from paginas import *
 
 
 
@@ -11,6 +12,7 @@ def tela_criar_time():
     arvore_b = ArvoreB(3)  #Instancia uma árvore de jogadores para cada clube 
                                 #isso facilita a busca de dados para cada clube
     
+
     novo_clube = Clube(arvore_b)        #Instacia um clube novo e da um nome à ele
     novo_clube.adicionar_clube_em_lista(arvoreTrie_clube, LISTA_MEUS_CLUBES)        #Adiciona clube em meus clubes
     novo_clube.adicionar_jogador()         #Adiciona jogadores ao clube novo
@@ -34,7 +36,7 @@ def tela_estatisticas():
 
 
 ###################################### Inicio da aplicação ########################################
-  
+controle_pag = ControlePaginas()
 manipulador_arq = Arquivos()    #Usado para manipular arquivos csv e listas - Traduções num geral
 colunas_desejadas = ['sofifa_id', 'short_name', 'age', 'nationality', 'overall', 
                      'club', 'player_positions']    #Seleciona quais dados serão usados
