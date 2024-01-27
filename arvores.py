@@ -2,7 +2,6 @@ import csv
 from arquivos import *
 
 
-
 #Pra overall e idade
 class NoArvoreB:
     def __init__(self, eh_folha=True):
@@ -17,6 +16,7 @@ class ArvoreB:
         self.indice_linhas = 1
         self.linhas_impressas = 0
     
+
     #Função de inserir nó na arvore e suas auxiliares
     def inserir(self, chave):
         raiz = self.raiz
@@ -26,6 +26,7 @@ class ArvoreB:
             self.dividir_filho(novo_no, 0)
             self.raiz = novo_no
         self.inserir_nao_cheio(self.raiz, chave)
+
 
     #Função auxiliar na inserção de um nó na árvore
     def inserir_nao_cheio(self, x, chave):
@@ -44,6 +45,7 @@ class ArvoreB:
                     i += 1
             self.inserir_nao_cheio(x.filhos[i], chave)
     
+
     #Função auxiliar na inserção de um nó na árvore
     def dividir_filho(self, x, i):
         t = self.t
@@ -73,16 +75,6 @@ class ArvoreB:
             writer.writerows(dados_arvore)
 
 
-
-
-
-
-
-
-
-
-
-
     def buscar_em_arvores(self, campo_pesquisa, opcao_filtro):
         jogadores_encontrados = []
 
@@ -94,24 +86,22 @@ class ArvoreB:
             nacionalidades_encontradas = arvoreTrie_nacionalidade.buscar_substring(campo_pesquisa)
             
             if nomes_encontrados != []:
-                print(f"Palavras que contêm a substring '{campo_pesquisa}': {nomes_encontrados}")
                 manipulador_arq.prep_arq_aux(arq_entrada=POUCOS_DADOS, coluna='short_name',
                                               strings=nomes_encontrados,arq_saida=ARQUIVO_AUXILIAR)
                 jogadores_encontrados = self.inserindo_filtros_em_busca(opcao_filtro, ARQUIVO_AUXILIAR)
             
             elif clubes_encontrados != []:
-                print(f"Palavras que contêm a substring '{campo_pesquisa}': {clubes_encontrados}")
                 manipulador_arq.prep_arq_aux(arq_entrada=POUCOS_DADOS, coluna='club', 
                                              strings=clubes_encontrados,arq_saida=ARQUIVO_AUXILIAR)
                 jogadores_encontrados = self.inserindo_filtros_em_busca(opcao_filtro, ARQUIVO_AUXILIAR)
             
             elif nacionalidades_encontradas != []:
-                print(f"Palavras que contêm a substring '{campo_pesquisa}': {nacionalidades_encontradas}")
                 manipulador_arq.prep_arq_aux(arq_entrada=POUCOS_DADOS, coluna='nationality', 
                                              strings=nacionalidades_encontradas,arq_saida=ARQUIVO_AUXILIAR)
                 jogadores_encontrados = self.inserindo_filtros_em_busca(opcao_filtro, ARQUIVO_AUXILIAR)
             
         return jogadores_encontrados
+
 
     def inserindo_filtros_em_busca(self, opcao_filtro, arq_entrada):
         if opcao_filtro == '1':
@@ -127,15 +117,7 @@ class ArvoreB:
         elif opcao_filtro == '4':
             self.criar_arvore_b('age', arq_entrada, ARVORE_IDADE)
             return self.obter_dados_arvore_b()
-
-
-
-
-
-
-
-
-
+        
 
     def obter_dados_arvore_b(self, no=None, dados=None):
         if dados is None:
@@ -150,15 +132,18 @@ class ArvoreB:
 
     
 
+
 #Pra nome, nacionalidade e clube
 class NoArvoreTrie:
     def __init__(self):
         self.filhos = {}
         self.fim_da_palavra = False
+        self.raiz_arvore_b = None
 
 class ArvoreTrie:
     def __init__(self):
         self.raiz = NoArvoreTrie()
+        
 
     def inserir(self, palavra):
         no = self.raiz
@@ -167,6 +152,33 @@ class ArvoreTrie:
                 no.filhos[char] = NoArvoreTrie()
             no = no.filhos[char]
         no.fim_da_palavra = True
+        no.raiz_arvore_b = ArvoreB(3)
+    
+    def delete(self, word):
+        self.delete_recursive(self.raiz, word, 0)
+
+    def delete_recursive(self, no, palavra, index):
+        if index == len(palavra):
+            if not no.fim_da_palavra:
+                # A palavra não está na árvore
+                return False
+            no.fim_da_palavra = False
+            # Verificar se o nó não tem mais filhos, se não tiver, pode ser removido
+            return len(no.filhos) == 0
+
+        char = palavra[index]
+        if char not in no.filhos:
+            # A palavra não está na árvore
+            return False
+
+        deletar_no_atual = self.delete_recursive(no.filhos[char], palavra, index + 1)
+
+        if deletar_no_atual:
+            del no.filhos[char]
+            # Verificar se o nó não tem mais filhos e não é o final de outra palavra, pode ser removido
+            return len(no.filhos) == 0 and not no.fim_da_palavra
+
+        return False
     
     def criar_arvore_trie(self, coluna, arq_entrada, arq_saida):
         with open(arq_entrada, newline='', encoding='utf-8') as arq_csv:
@@ -188,17 +200,31 @@ class ArvoreTrie:
             no = no.filhos[char]
         return no.fim_da_palavra
     
+    def buscar_raiz_arvore_b(self, nome_clube):
+        no = self.raiz
+
+        for char in nome_clube:
+            if char not in no.filhos:
+                return None  # Clube não encontrado na árvore Trie
+
+            no = no.filhos[char]
+
+        if no.fim_da_palavra:
+            return no.raiz_arvore_b
+        else:
+            return None  # Clube não encontrado na árvore Trie
+    
     def buscar_substring(self, substring):
         resultados = []
-        self._buscar_substring_na_arvore(self.raiz, substring, "", resultados)
+        self.buscar_substring_na_arvore(self.raiz, substring, "", resultados)
         return resultados
 
-    def _buscar_substring_na_arvore(self, no, substring, palavra_atual, resultados):
-        if no.fim_da_palavra and substring in palavra_atual:
+    def buscar_substring_na_arvore(self, no, substring, palavra_atual, resultados):
+        if no.fim_da_palavra and substring.lower() in palavra_atual.lower():
             resultados.append(palavra_atual)
 
         for char, filho in no.filhos.items():
-            self._buscar_substring_na_arvore(filho, substring, palavra_atual + char, resultados)
+            self.buscar_substring_na_arvore(filho, substring, palavra_atual + char, resultados)
 
 
     def obter_dados_arvore_trie(self, no=None, palavra_atual='', dados=None):
@@ -212,13 +238,13 @@ class ArvoreTrie:
             self.obter_dados_arvore_trie(filho, palavra_atual + chave, dados)
         return dados
 
-    def imprimir(self, no=None, palavra=''):
-        if no is None:
-            no = self.raiz
-        if no.fim_da_palavra:
-            print(palavra)
-        for char, prox_no in no.filhos.items():
-            self.imprimir(prox_no, palavra + char)
+    # def imprimir(self, no=None, palavra=''):
+    #     if no is None:
+    #         no = self.raiz
+    #     if no.fim_da_palavra:
+    #         print(palavra)
+    #     for char, prox_no in no.filhos.items():
+    #         self.imprimir(prox_no, palavra + char)
 
 
 
@@ -231,3 +257,5 @@ arvoreTrie_nacionalidade.criar_arvore_trie(coluna=4,arq_entrada=POUCOS_DADOS,arq
 
 arvoreTrie_clube = ArvoreTrie()
 arvoreTrie_clube.criar_arvore_trie(coluna=5, arq_entrada=POUCOS_DADOS, arq_saida=LISTA_TODOS_CLUBES)
+
+arvoreTrie_meus_clubes = ArvoreTrie()

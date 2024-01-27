@@ -50,46 +50,25 @@ class Arquivos:
         informacoes_desejadas = self.ler_arquivo_csv(csv_entrada, lista_de_colunas_desejadas, ler_cabecalho=True)
 
         self.escrever_lista_em_csv(csv_saida, informacoes_desejadas)
+
+
+    def procurar_id_na_lista(self, arq_entrada, id_jogador):
+        dados = []
+        with open(arq_entrada, 'r', newline='', encoding='utf-8') as arq_csv:
+            leitor_csv = csv.DictReader(arq_csv)
+
+            lista_de_colunas_desejadas = ['sofifa_id', 'short_name', 'age', 'overall']
+
+            for col in leitor_csv:
+                if col['sofifa_id'] == id_jogador:
+                    # Obtém os valores das colunas desejadas
+                    info_selecionadas = [col[coluna] for coluna in lista_de_colunas_desejadas]
+                    dados.append(','.join(info_selecionadas))
+            
         
-
-
-    def imprimir_lista_meus_clubes(self):
-        with open(LISTA_MEUS_CLUBES, 'r', newline='', encoding='utf-8') as arq_csv:
-                leitor_csv = csv.DictReader(arq_csv)
-                for linha in leitor_csv:
-                    print(f'{linha['meus_clubes']}')
-
-
-    def compara_nome_com_lista(self, lista, nome, coluna):
-        igualdade_encontrada = False
-
-        with open(lista, 'r', newline='', encoding='utf-8') as arq_csv:
-                leitor_csv = csv.DictReader(arq_csv)
-                for linha in leitor_csv:
-                    if linha[coluna] == nome:
-                        print('Já existe um time com esse nome!\n')
-                        print('Digite o nome do seu time: ')
-                        igualdade_encontrada = True
-                        break
-        return igualdade_encontrada
-
-
-    #Acho q não vai ser feito
-    def ajustar_coluna_posicoes(arq_entrada):
-        posicoes = []
-        coluna_desejada = ['player_positions']
-        posicoes = manipulador_arq.ler_arquivo_csv(arq_entrada, coluna_desejada)
-        #Trocar as siglas e deixar só Ataque com todas siglas de ataque, defesa com todas siglas de defesa, etc
-        #Problemas: tem jogadores que podem ser tanto atacantes quanto meio campistas
-        #Não vejo vantagem em fazer, a não ser pra ficar "mais bonito"
-        return
-    
-
-
-
-
-
-
+        return dados
+                        
+       
     def prep_arq_aux(self, arq_entrada, coluna, strings, arq_saida):
         with open(arq_entrada, 'r', newline='', encoding='utf-8') as arq_csv:
             leitor_csv = csv.reader(arq_csv)
@@ -106,5 +85,18 @@ class Arquivos:
                         if linha[indice] == string:
                             escritor_csv.writerow(linha)
 
+
+
+
+
+    #Acho q não vai ser feito
+    def ajustar_coluna_posicoes(arq_entrada):
+        posicoes = []
+        coluna_desejada = ['player_positions']
+        posicoes = manipulador_arq.ler_arquivo_csv(arq_entrada, coluna_desejada)
+        #Trocar as siglas e deixar só Ataque com todas siglas de ataque, defesa com todas siglas de defesa, etc
+        #Problemas: tem jogadores que podem ser tanto atacantes quanto meio campistas
+        #Não vejo vantagem em fazer, a não ser pra ficar "mais bonito"
+        return
 
 manipulador_arq = Arquivos()

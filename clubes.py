@@ -3,13 +3,12 @@ from arquivos import *
 from arvores import *
 from paginas import *
 
-TOTAL_JOGADORES_POR_CLUBE = 3
+TOTAL_JOGADORES_POR_CLUBE = 2
 
 class Clube:
     def __init__(self):
         self.nome_clube = 'Inválido'
         self.numero_jogadores = 0
-        self.arvore_trie_jogadores = ArvoreTrie()
         self.arvore_jogadores = ArvoreB(3)
 
 
@@ -25,13 +24,14 @@ class Clube:
         
         manipulador_arq.escrever_lista_em_csv(lista,meus_clubes)
         
+        return self.nome_clube
+
 
     def validar_nome_clube(self, arvore_times, lista):
-        print('Digite o nome do seu time: ')
         nome_valido = False
 
         while not nome_valido:
-            self.nome_clube = input()
+            self.nome_clube = input('Digite o nome do seu time: ')
             time_existente_csv = False
             time_existente_arvore = False
 
@@ -39,18 +39,17 @@ class Clube:
             with open(lista, 'r', newline='', encoding='utf-8') as arq_csv:
                 leitor_csv = csv.DictReader(arq_csv)
                 for linha in leitor_csv:
-                    if linha['meus_clubes'] == self.nome_clube:
+                    if linha['meus_clubes'].lower() == self.nome_clube.lower():
                         print('Já existe um time com esse nome!\n')
-                        print('Digite o nome do seu time: ')
                         time_existente_csv = True
                         break
+                
             
             #Verifica se o nome do clube está na arvore de clubes do FIFA
             if not time_existente_csv:
                 times_existentes = arvore_times.buscar_substring(self.nome_clube)
                 if times_existentes:
                     print('Já existe um time com esse nome!\n')
-                    print('Digite o nome do seu time: ')
                     time_existente_arvore = True
 
             #Se não estiver em nenhum lugar o nome do clube é válido
@@ -65,50 +64,53 @@ class Clube:
         #1- Buscar jogador
         #   -Campo de busca (nome parcial, nacionalidade ou clube parcial) + Filtro (overall ou idade,ambos crescentes ou decrescentes)
         #receber como retorno o nome do jogador e seus dados
-        jogadores_adicionados = []
         while self.numero_jogadores < TOTAL_JOGADORES_POR_CLUBE:
             #Buscas por campo de pesquisa e filtros
             arvore_jogadores_encontrados = ArvoreB(3)
-            campo_pesquisa = input('Digite arvore_b.um nome, uma nacionalidade ou um clube:\nCampo de Pesquisa: ')
+            campo_pesquisa = input('Digite um nome, uma nacionalidade ou um clube:\nCampo de Pesquisa: ')
             opcao_filtro = selecionar_filtro()
             
             #Busca na árvore conforme os filtros e retorna uma lista de jogadores que se enquadram
             jogadores_encontrados = self.buscar_jogadores(campo_pesquisa, opcao_filtro, arvore_jogadores_encontrados)
-            print(f'\nID DO JOGADOR ESCOLHIDO {jogadores_encontrados}\n')
             
             jogador_escolhido = self.escolher_jogador(opcao_filtro, arvore_jogadores_encontrados)
             
 
             if jogador_escolhido == 'imprimir':
-                jogador_escolhido = input('Se deseja adicionar algum jogador digite seu ID\n'
-                                          'Se deseja fazer uma nova busca tecle "b"\n')
+                jogador_escolhido = input('\nSe deseja adicionar algum jogador digite seu ID\n'
+                                            'Se deseja fazer uma nova busca tecle "b"\n'
+                                            'Selecione uma das opções acima: ')
+                print('\n') #print para formatação no terminal ficar certinho
             #'b' por causa que a escolha do usuario dps de imprimir todos jogadores só é feita logo acima
             if jogador_escolhido == 'b' or jogador_escolhido == 'nova_busca': 
-                                         
-                print('\nENTROU ONDE DEVIA E PROXIMA LINHA DEVE SER CAMPO DE PESQUISA\n\n')
                 continue
             
+            #Adiciona jogadores de fato
             else:
                 jogador_valido = verifica_id_do_jogador(jogadores_encontrados, jogador_escolhido)
                 if jogador_valido:
-                    jogadores_adicionados.append(jogador_escolhido)
+                    arvore_jogadores = arvoreTrie_meus_clubes.buscar_raiz_arvore_b(self.nome_clube)
+                    dados_jogador = manipulador_arq.procurar_id_na_lista(POUCOS_DADOS, jogador_escolhido)
+
+                    for dado in dados_jogador:
+                        arvore_jogadores.inserir(dado)
+
                     self.numero_jogadores += 1
-                    print(f'\nID JOGADOR ESCOLHIDO: {jogador_escolhido} | NUM JOGADORES NO MEU CLUBE: {self.numero_jogadores}\n')
+                    print('Jogador adicionado ao seu time!')
+                    print(f'Jogadores no seu clube: {self.numero_jogadores} de {TOTAL_JOGADORES_POR_CLUBE}\n')
                 else:
                     print('O ID fornecido não foi encontrado!')
                 continue
         
-        self.arvore_jogadores.criar_arvore_b('overall', POUCOS_DADOS, 'arquivos/arq_teste.csv')
+        #self.arvore_jogadores.criar_arvore_b('overall', POUCOS_DADOS, 'arquivos/arq_teste.csv')
 
-        
 
     def buscar_jogadores(self, campo_pesquisa, opcao_filtro, arvore_jogadores_encontrados):
 
         jogadores_encontrados = arvore_jogadores_encontrados.buscar_em_arvores(campo_pesquisa, opcao_filtro)
 
         return jogadores_encontrados
-        
-
+    
 
     def escolher_jogador(self, opcao_filtro, arvore_jogadores_encontrados):
             
@@ -124,7 +126,6 @@ class Clube:
         # # Verificar se a busca foi interrompida devido à paginação
         # escolha_usuario = controle_paginas.paginacao()
 
-        #print(f'\nESCOLHA NA FUNÇÃO ESCOLHER{escolha_usuario}\n')
 
         if escolha_usuario == 'nova_busca':
             # Voltar ao início do loop para uma nova busca
@@ -134,10 +135,6 @@ class Clube:
         else:
             # Retornar o ID do jogador e sair do loop
             return escolha_usuario
-                
-
-        
-        
     
 
 def verifica_id_do_jogador(jogadores_encontrados, jogador_escolhido):
@@ -158,14 +155,15 @@ def verifica_id_do_jogador(jogadores_encontrados, jogador_escolhido):
     return jogador_valido
 
 
-
 def selecionar_filtro():
     opcao_valida = False
     while opcao_valida == False:
-        opcao_filtro = input('\nInformação do Campo de Pesquisa salvo!\n'
-                        'Deseja que os jogadores encontrados sejam visualizados de qual maneira?\n'
-                        '1. Ordenados por overall decrescente\n2. Ordenados por overall crescente\n'
-                        '3. Ordenados por idade decrescente\n4. Ordenados por idade crescente\n')
+        opcao_filtro = input('\nOpções disponíveis:\n'
+                            '1. Ordenados por overall decrescente\n2. Ordenados por overall crescente\n'
+                            '3. Ordenados por idade decrescente\n4. Ordenados por idade crescente\n'
+                            '\nDeseja que os jogadores encontrados sejam visualizados de qual maneira? ')
+        print('\n') #print para formatação no terminal ficar certinha
+                        
         if opcao_filtro == '1' or opcao_filtro == '2' or opcao_filtro == '3' or opcao_filtro == '4':
             opcao_valida = True
         else:
