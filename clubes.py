@@ -12,49 +12,57 @@ class Clube:
         self.arvore_jogadores = ArvoreB(3)
 
 
-    def adicionar_clube_em_lista(self, arvore_times, lista):
-        self.nome_clube = self.validar_nome_clube(arvore_times, lista)
+    def adicionar_clube_em_lista(self, arvore_times, arvore_meus_clubes):
+        self.nome_clube = self.validar_nome_clube(arvore_times, arvore_meus_clubes)
         meus_clubes = []
         #Le clubes já criado para reescreve-los adicionados do novo clube criado
-        coluna_desejada = ['meus_clubes']
-        meus_clubes = manipulador_arq.ler_arquivo_csv(lista, coluna_desejada, ler_cabecalho=True)
+        # coluna_desejada = ['meus_clubes']
+        # meus_clubes = manipulador_arq.ler_arquivo_csv(lista, coluna_desejada, ler_cabecalho=True)
 
-        if self.nome_clube not in meus_clubes:
-            meus_clubes.append(self.nome_clube)
+        # if self.nome_clube not in meus_clubes:
+        #     meus_clubes.append(self.nome_clube)
         
-        manipulador_arq.escrever_lista_em_csv(lista,meus_clubes)
+        # manipulador_arq.escrever_lista_em_csv(lista,meus_clubes)
         
         return self.nome_clube
 
 
-    def validar_nome_clube(self, arvore_times, lista):
+    def validar_nome_clube(self, arvore_times, arvore_meus_clubes):
         nome_valido = False
 
         while not nome_valido:
             self.nome_clube = input('Digite o nome do seu time: ')
             time_existente_csv = False
             time_existente_arvore = False
+            time_existente_meus_clubes = False
 
             #Verifica se o nome do clube está no arquivo csv contendo todos MEUS CLUBES
-            with open(lista, 'r', newline='', encoding='utf-8') as arq_csv:
-                leitor_csv = csv.DictReader(arq_csv)
-                for linha in leitor_csv:
-                    if linha['meus_clubes'].lower() == self.nome_clube.lower():
-                        print('Já existe um time com esse nome!\n')
-                        time_existente_csv = True
-                        break
+            # with open(lista, 'r', newline='', encoding='utf-8') as arq_csv:
+            #     leitor_csv = csv.DictReader(arq_csv)
+            #     for linha in leitor_csv:
+            #         if linha['meus_clubes'].lower() == self.nome_clube.lower():
+            #             print('Já existe um time com esse nome!\n')
+            #             time_existente_csv = True
+            #             break
+
+            if not time_existente_meus_clubes:
+                times_existentes = arvore_meus_clubes.buscar_substring(self.nome_clube)
+                if times_existentes:
+                    print('Já existe um time com esse nome!\n')
+                    time_existente_meus_clubes = True
+
                 
             
             #Verifica se o nome do clube está na arvore de clubes do FIFA
-            if not time_existente_csv:
+            if not time_existente_meus_clubes:
                 times_existentes = arvore_times.buscar_substring(self.nome_clube)
                 if times_existentes:
                     print('Já existe um time com esse nome!\n')
                     time_existente_arvore = True
 
             #Se não estiver em nenhum lugar o nome do clube é válido
-            if not time_existente_csv and not time_existente_arvore:
-                arvore_times.inserir(self.nome_clube)
+            if not time_existente_meus_clubes and not time_existente_arvore:
+                #arvore_times.inserir(self.nome_clube)
                 nome_valido = True
 
         return self.nome_clube
@@ -90,7 +98,7 @@ class Clube:
                 jogador_valido = verifica_id_do_jogador(jogadores_encontrados, jogador_escolhido)
                 if jogador_valido:
                     arvore_jogadores = arvoreTrie_meus_clubes.buscar_raiz_arvore_b(self.nome_clube)
-                    dados_jogador = manipulador_arq.procurar_id_na_lista(POUCOS_DADOS, jogador_escolhido)
+                    dados_jogador = manipulador_arq.procurar_id_na_lista(ARQUIVO_DADOS_DESEJADOS, jogador_escolhido)
 
                     for dado in dados_jogador:
                         arvore_jogadores.inserir(dado)
@@ -102,7 +110,6 @@ class Clube:
                     print('O ID fornecido não foi encontrado!')
                 continue
         
-        #self.arvore_jogadores.criar_arvore_b('overall', POUCOS_DADOS, 'arquivos/arq_teste.csv')
 
 
     def buscar_jogadores(self, campo_pesquisa, opcao_filtro, arvore_jogadores_encontrados):
@@ -122,9 +129,6 @@ class Clube:
             escolha_usuario = percorrer_e_imprimir(arvore_jogadores_encontrados.raiz, 'age', 'decrescente')
         elif opcao_filtro == '4':
             escolha_usuario = percorrer_e_imprimir(arvore_jogadores_encontrados.raiz, 'age', 'crescente')
-
-        # # Verificar se a busca foi interrompida devido à paginação
-        # escolha_usuario = controle_paginas.paginacao()
 
 
         if escolha_usuario == 'nova_busca':

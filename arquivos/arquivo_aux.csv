@@ -1,3 +1,110 @@
-sofifa_id,short_name,overall,age,nationality,club,player_positions
-190871,Neymar,86,22,Brazil,FC Barcelona,LW
-54050,W. Rooney,86,28,England,Manchester United,ST, CF, CAM
+sofifa_id,short_name,age,nationality,overall,club,player_positions
+5479,Casillas,33,Spain,84,Real Madrid,GK
+200949,Lucas,21,Brazil,82,Paris Saint-Germain,RW, RM
+172610,Leandro Castán,27,Brazil,81,Roma,CB
+177644,Kiko Casilla,27,Spain,80,RCD Espanyol,GK
+167431,G. Castro,27,Germany,80,Bayer 04 Leverkusen,CM, RM, RB, CF
+7631,A. Cassano,31,Italy,80,Parma,CF
+176266,Lucas Leiva,27,Brazil,79,Liverpool,CDM, CM
+115909,Rubén Castro,33,Spain,78,Real Betis,ST, LM
+174379,G. Castro,29,Uruguay,78,Real Sociedad,LW, RW
+147006,Diego Castro,31,Spain,77,Getafe CF,LM, RM, CAM
+203038,Lucas Piazon,20,Brazil,76,Eintracht Frankfurt,LW, LM
+200145,Casemiro,22,Brazil,76,FC Porto,CDM, CM
+215071,M. Casco,26,Argentina,75,Newell's Old Boys,LB
+199354,Lucas Pérez,25,Spain,74,Deportivo de La Coruña,RM, LM, ST, CAM
+137380,M. Cassani,30,Italy,74,Parma,RB, CB
+198175,L. Castaignos,21,Netherlands,73,FC Twente,ST
+184133,Castro,26,Portugal,73,Kasimpaşa SK,CM
+183354,Casado,27,Spain,73,Málaga CF,LB
+205633,L. Castro,25,Argentina,72,Catania,LW, CAM
+7584,L. Castellazzi,38,Italy,72,Torino,GK
+155931,Casto,32,Spain,72,UD Las Palmas,GK
+157947,Zé Castro,31,Portugal,72,Rayo Vallecano,CB
+158789,A. Castro,30,Argentina,72,Newell's Old Boys,LW, CAM
+192984,K. Casteels,22,Belgium,71,TSG 1899 Hoffenheim,GK
+202858,F. Castillo,22,Colombia,71,FC Dallas,LW, LM
+202142,Nacho Cases,26,Spain,71,Real Sporting de Gijón,CM, CDM, CAM, CF
+198426,G. Castellani,26,Argentina,71,Boca Juniors,CAM, CM
+175243,S. Castillo,32,Ecuador,71,Ecuador,CDM, CM, CB
+212878,N. Castillo,21,Chile,70,Club Brugge KV,ST
+169387,E. Cascione,30,Italy,70,Cesena,CDM, CM
+179684,J. Castillo,36,Uruguay,70,Deportivo Pasto,GK
+214190,L. Castellanos,30,Colombia,70,Independiente Medellín,GK
+215169,F. Castillón,28,Argentina,70,Racing Club,ST
+101490,C. Casey,32,United States,68,Philadelphia Union,ST
+171364,E. Castillo,27,United States,68,Club Atlas,LB, CM
+176540,B. Castillo,36,Colombia,68,Envigado FC,GK
+219941,G. Castellón,20,Chile,67,Santiago Wanderers,GK
+190093,Dani Castellano,26,Spain,67,UD Las Palmas,LB, LM
+202161,F. Concas,27,Italy,67,Carpi,RM
+139016,I. Castro,33,Mexico,67,Guadalajara,CM, CDM
+161801,Xabi Castillo,28,Spain,67,Deportivo Alavés,LB, CB
+203654,L. Castaldo,32,Italy,67,Avellino,ST
+210556,Lucas João,20,Portugal,66,CD Nacional,ST
+202486,Lucas,22,Brazil,66,Boavista FC,CB
+190814,G. Castillion,23,Netherlands,66,New England Revolution,ST
+197239,Lucas Porcar,24,Spain,66,CE Sabadell FC,CAM, RM
+214687,F. Castro,23,Chile,66,Deportes Iquique,ST, RM
+190094,Javi Castellano,26,Spain,66,UD Las Palmas,CDM, CM
+181922,Lucas Silva,29,Brazil,66,Monterrey,CM, RM, ST, CDM
+158595,A. Castro,27,Mexico,65,Cruz Azul,CDM, CM, RB
+189736,F. Casarini,24,Italy,65,Bologna,CM
+199199,Casado,25,Spain,65,Real Betis,LB
+208618,Lucas Vázquez,22,Spain,65,RCD Espanyol,RM, LM
+190790,E. Castro,25,Mexico,65,Club Tijuana,CB
+167421,C. Casteglione,34,Argentina,65,Defensa y Justicia,CB
+168593,S. Acasiete,36,Peru,65,Peru,CB
+199917,J. Forster-Caskey,20,England,64,Brighton & Hove Albion,CM, CAM
+204527,Aitor Castro,21,Spain,64,Real Sociedad,CM
+214562,L. Castro,25,Colombia,64,Rionegro Águilas,ST
+193909,Escassi,25,Spain,64,AD Alcorcón,CB, CDM, CM
+109493,B. Castro,31,Belgium,64,Heracles Almelo,GK
+215559,Lucas Evangelista,19,Brazil,63,Udinese,CAM
+210617,Samu Castillejo,19,Spain,63,Málaga CF,LM, RM, CAM
+189439,L. Castiglia,25,Italy,63,FC Pro Vercelli 1892,CM, CDM
+213425,A. Castro,23,Costa Rica,63,Sarpsborg 08 FF,ST, LM
+221387,L. Castillo,21,Mexico,63,Tigres U.A.N.L.,LW, CF
+207614,T. Cascio,24,United States,63,Houston Dynamo,LM, CAM
+213097,Lucas Souza,24,Brazil,63,Parma,CDM, CM
+225090,Sergio Buenacasa,18,Spain,62,Juventus,ST
+214698,L. Casanova,21,Chile,62,Unión La Calera,CB
+192005,G. Casillas,20,Mexico,62,Jaguares de Chiapas,LM, CAM, LW
+193884,S. Clucas,23,England,62,Chesterfield,LW, RW, ST
+216792,Castañeda,23,Spain,62,SD Ponferradina,LB, CB
+214845,J. Castillo,24,Chile,62,Santiago Wanderers,LM
+220047,Lucas Gafarot,19,Spain,61,FC Barcelona B,LB, RB
+184698,J. Castillo,26,Mexico,61,Tiburones Rojos de Veracruz,LM, LB
+210539,Cassio,23,Brazil,61,FC Thun,ST, LW, RW
+202245,A. Caskey,25,United States,61,DC United,LM
+214486,J. Castro,29,Colombia,61,Uniautónoma FC,RB, RM
+213868,J. Castelletto,19,France,60,AJ Auxerre,CB, RB
+225121,Castro,19,Spain,60,Real Sporting de Gijón,ST, CF
+211588,Casado,21,Spain,60,Real Valladolid CF,CB, CDM
+223684,Lucas Mineiro,21,Brazil,60,Associação Académica de Coimbra,CDM
+201105,J. Cassidy,21,Wales,60,Notts County,ST
+153076,J. Castillo,36,Colombia,60,Boyacá Chicó FC,ST
+222501,T. Castagne,18,Belgium,59,KRC Genk,CB
+211795,M. Castañeda,22,Mexico,59,Club León,CM, RM, ST
+202895,C. Lancaster,21,England,59,Stevenage,ST
+140150,J. Castillejos,33,Mexico,59,Leones Negros de la UdeG,CM
+209311,F. Dao Castellana,20,France,58,OGC Nice,CDM, CM
+225020,J. Castro,18,Chile,58,CD Huachipato,CM
+183780,O. Lancashire,25,England,58,Rochdale,CB
+215991,D. Castillo,24,Chile,58,AC Barnechea,CB
+223106,F. Castro,18,Argentina,57,Racing Club,ST
+200385,L. Lucas,22,Wales,57,Swansea City,CM
+216250,R. Lucas,19,Netherlands,57,Go Ahead Eagles,GK
+214360,V. Castillo,26,Colombia,56,Alianza Petrolera,CM, CDM
+220056,M. Casale,18,Italy,55,Inter,ST
+222788,G. Castillo,19,Mexico,55,Deportivo Toluca,RM
+221693,G. Van De Casteele,23,United States,55,Colorado Rapids,CB
+163365,D. Cassidy,29,Republic of Ireland,55,Bray Wanderers,CM, CAM
+212415,S. Castano,19,United States,54,New York Red Bulls,GK
+209590,A. Casadei,26,Italy,54,SS Virtus Lanciano,GK
+224034,E. Castaño,18,Colombia,52,Once Caldas,CM
+220805,A. Castro,20,Colombia,52,Alianza Petrolera,CAM
+221928,M. Castroman,19,Switzerland,51,BSC Young Boys,CAM
+209015,R. Lucas,18,England,50,Rotherham United,RB, CB
+224181,Lucas Guedes,18,Brazil,49,Wisła Kraków,CM
+225415,G. Casey,17,England,45,Stevenage,CM

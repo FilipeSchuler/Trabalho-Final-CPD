@@ -9,6 +9,7 @@ class NoArvoreB:
         self.chaves = []
         self.filhos = []
 
+
 class ArvoreB:
     def __init__(self, t):
         self.raiz = NoArvoreB(eh_folha=True)
@@ -60,7 +61,7 @@ class ArvoreB:
             y.filhos = y.filhos[:t]
     
 
-    def criar_arvore_b(self, coluna, arq_entrada, arq_saida):
+    def criar_arvore_b(self, coluna, arq_entrada):
         chaves = []
         manipulador_arq = Arquivos()
         colunas_desejadas = [str(coluna), 'short_name', 'sofifa_id']
@@ -69,34 +70,29 @@ class ArvoreB:
         for chave in chaves:
             self.inserir(chave)
 
-        dados_arvore = self.obter_dados_arvore_b()
-        with open(arq_saida, 'w', newline='', encoding='utf-8') as arq_csv:
-            writer = csv.writer(arq_csv)
-            writer.writerows(dados_arvore)
-
 
     def buscar_em_arvores(self, campo_pesquisa, opcao_filtro):
         jogadores_encontrados = []
 
         if campo_pesquisa == '':
-            jogadores_encontrados = self.inserindo_filtros_em_busca(opcao_filtro, POUCOS_DADOS)
+            jogadores_encontrados = self.inserindo_filtros_em_busca(opcao_filtro, ARQUIVO_DADOS_DESEJADOS)
         else:
             nomes_encontrados = arvoreTrie_nome_jogador.buscar_substring(campo_pesquisa)
             clubes_encontrados = arvoreTrie_clube.buscar_substring(campo_pesquisa)
             nacionalidades_encontradas = arvoreTrie_nacionalidade.buscar_substring(campo_pesquisa)
             
             if nomes_encontrados != []:
-                manipulador_arq.prep_arq_aux(arq_entrada=POUCOS_DADOS, coluna='short_name',
+                manipulador_arq.prep_arq_aux(arq_entrada=ARQUIVO_DADOS_DESEJADOS, coluna='short_name',
                                               strings=nomes_encontrados,arq_saida=ARQUIVO_AUXILIAR)
                 jogadores_encontrados = self.inserindo_filtros_em_busca(opcao_filtro, ARQUIVO_AUXILIAR)
             
             elif clubes_encontrados != []:
-                manipulador_arq.prep_arq_aux(arq_entrada=POUCOS_DADOS, coluna='club', 
+                manipulador_arq.prep_arq_aux(arq_entrada=ARQUIVO_DADOS_DESEJADOS, coluna='club', 
                                              strings=clubes_encontrados,arq_saida=ARQUIVO_AUXILIAR)
                 jogadores_encontrados = self.inserindo_filtros_em_busca(opcao_filtro, ARQUIVO_AUXILIAR)
             
             elif nacionalidades_encontradas != []:
-                manipulador_arq.prep_arq_aux(arq_entrada=POUCOS_DADOS, coluna='nationality', 
+                manipulador_arq.prep_arq_aux(arq_entrada=ARQUIVO_DADOS_DESEJADOS, coluna='nationality', 
                                              strings=nacionalidades_encontradas,arq_saida=ARQUIVO_AUXILIAR)
                 jogadores_encontrados = self.inserindo_filtros_em_busca(opcao_filtro, ARQUIVO_AUXILIAR)
             
@@ -105,17 +101,17 @@ class ArvoreB:
 
     def inserindo_filtros_em_busca(self, opcao_filtro, arq_entrada):
         if opcao_filtro == '1':
-            self.criar_arvore_b('overall', arq_entrada, ARVORE_OVERALL)
+            self.criar_arvore_b('overall', arq_entrada)
             return self.obter_dados_arvore_b()
         elif opcao_filtro == '2':
-            self.criar_arvore_b('overall', arq_entrada, ARVORE_OVERALL)
+            self.criar_arvore_b('overall', arq_entrada)
             return self.obter_dados_arvore_b()
         
         elif opcao_filtro == '3':
-            self.criar_arvore_b('age', arq_entrada, ARVORE_IDADE)
+            self.criar_arvore_b('age', arq_entrada)
             return self.obter_dados_arvore_b()
         elif opcao_filtro == '4':
-            self.criar_arvore_b('age', arq_entrada, ARVORE_IDADE)
+            self.criar_arvore_b('age', arq_entrada)
             return self.obter_dados_arvore_b()
         
 
@@ -131,7 +127,7 @@ class ArvoreB:
         return dados
 
     
-
+############################################# ARVORES TRIE #######################################
 
 #Pra nome, nacionalidade e clube
 class NoArvoreTrie:
@@ -180,17 +176,12 @@ class ArvoreTrie:
 
         return False
     
-    def criar_arvore_trie(self, coluna, arq_entrada, arq_saida):
+    def criar_arvore_trie(self, coluna, arq_entrada):
         with open(arq_entrada, newline='', encoding='utf-8') as arq_csv:
             ler_csv = csv.reader(arq_csv)
             for col in ler_csv:
                 self.inserir(col[coluna]) 
         
-        dados_arvore = self.obter_dados_arvore_trie()
-        
-        with open(arq_saida, 'w', newline='', encoding='utf-8') as arq_csv:
-            writer = csv.writer(arq_csv)
-            writer.writerows(dados_arvore)
 
     def buscar(self, palavra):
         no = self.raiz
@@ -238,24 +229,15 @@ class ArvoreTrie:
             self.obter_dados_arvore_trie(filho, palavra_atual + chave, dados)
         return dados
 
-    # def imprimir(self, no=None, palavra=''):
-    #     if no is None:
-    #         no = self.raiz
-    #     if no.fim_da_palavra:
-    #         print(palavra)
-    #     for char, prox_no in no.filhos.items():
-    #         self.imprimir(prox_no, palavra + char)
-
-
 
 #Inicializa/cria as árvores Trie
 arvoreTrie_nome_jogador = ArvoreTrie()
-arvoreTrie_nome_jogador.criar_arvore_trie(coluna=1, arq_entrada=POUCOS_DADOS, arq_saida=LISTA_TODOS_NOMES)
+arvoreTrie_nome_jogador.criar_arvore_trie(coluna=1, arq_entrada=ARQUIVO_DADOS_DESEJADOS)
 
 arvoreTrie_nacionalidade = ArvoreTrie()
-arvoreTrie_nacionalidade.criar_arvore_trie(coluna=4,arq_entrada=POUCOS_DADOS,arq_saida=TODAS_NACIONALIDADES)
+arvoreTrie_nacionalidade.criar_arvore_trie(coluna=3,arq_entrada=ARQUIVO_DADOS_DESEJADOS)
 
 arvoreTrie_clube = ArvoreTrie()
-arvoreTrie_clube.criar_arvore_trie(coluna=5, arq_entrada=POUCOS_DADOS, arq_saida=LISTA_TODOS_CLUBES)
+arvoreTrie_clube.criar_arvore_trie(coluna=5, arq_entrada=ARQUIVO_DADOS_DESEJADOS)
 
 arvoreTrie_meus_clubes = ArvoreTrie()
