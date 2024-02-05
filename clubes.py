@@ -1,4 +1,3 @@
-import csv
 from arquivos import *
 from arvores import *
 from paginas import *
@@ -14,15 +13,6 @@ class Clube:
 
     def adicionar_clube_em_lista(self, arvore_times, arvore_meus_clubes):
         self.nome_clube = self.validar_nome_clube(arvore_times, arvore_meus_clubes)
-        meus_clubes = []
-        #Le clubes já criado para reescreve-los adicionados do novo clube criado
-        # coluna_desejada = ['meus_clubes']
-        # meus_clubes = manipulador_arq.ler_arquivo_csv(lista, coluna_desejada, ler_cabecalho=True)
-
-        # if self.nome_clube not in meus_clubes:
-        #     meus_clubes.append(self.nome_clube)
-        
-        # manipulador_arq.escrever_lista_em_csv(lista,meus_clubes)
         
         return self.nome_clube
 
@@ -36,22 +26,11 @@ class Clube:
             time_existente_arvore = False
             time_existente_meus_clubes = False
 
-            #Verifica se o nome do clube está no arquivo csv contendo todos MEUS CLUBES
-            # with open(lista, 'r', newline='', encoding='utf-8') as arq_csv:
-            #     leitor_csv = csv.DictReader(arq_csv)
-            #     for linha in leitor_csv:
-            #         if linha['meus_clubes'].lower() == self.nome_clube.lower():
-            #             print('Já existe um time com esse nome!\n')
-            #             time_existente_csv = True
-            #             break
-
             if not time_existente_meus_clubes:
                 times_existentes = arvore_meus_clubes.buscar_substring(self.nome_clube)
                 if times_existentes:
                     print('Já existe um time com esse nome!\n')
-                    time_existente_meus_clubes = True
-
-                
+                    time_existente_meus_clubes = True 
             
             #Verifica se o nome do clube está na arvore de clubes do FIFA
             if not time_existente_meus_clubes:
