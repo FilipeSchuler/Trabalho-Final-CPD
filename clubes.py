@@ -2,7 +2,7 @@ from arquivos import *
 from arvores import *
 from paginas import *
 
-TOTAL_JOGADORES_POR_CLUBE = 2
+TOTAL_JOGADORES_POR_CLUBE = 5
 
 class Clube:
     def __init__(self):
